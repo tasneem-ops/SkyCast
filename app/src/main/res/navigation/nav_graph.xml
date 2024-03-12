@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.skycast.home.view.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.skycast.favorites.view.FavoritesFragment"
+        android:label="Favorites"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_favoritesFragment_to_addFavoriteFragment"
+            app:destination="@id/addFavoriteFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFavoriteFragment"
+        android:name="com.example.skycast.favorites.view.AddFavoriteFragment"
+        android:label="Add Favorite"
+        tools:layout="@layout/fragment_add_favorite">
+        <action
+            android:id="@+id/action_addFavoriteFragment_to_favoritesFragment"
+            app:destination="@id/favoritesFragment" />
+        <action
+            android:id="@+id/action_addFavoriteFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_addFavoriteFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/alertFragment"
+        android:name="com.example.skycast.alert.view.AlertFragment"
+        android:label="Alerts"
+        tools:layout="@layout/fragment_alert">
+        <action
+            android:id="@+id/action_alertFragment_to_addAlertFragment"
+            app:destination="@id/addAlertFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAlertFragment"
+        android:name="com.example.skycast.alert.view.AddAlertFragment"
+        android:label="Add Alert"
+        tools:layout="@layout/fragment_add_alert">
+        <action
+            android:id="@+id/action_addAlertFragment_to_alertFragment"
+            app:destination="@id/alertFragment" />
+        <action
+            android:id="@+id/action_addAlertFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_addAlertFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.skycast.settings.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.skycast.location.view.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.example.skycast.location.view.MapsFragment"
+        android:label="Map"
+        tools:layout="@layout/fragment_maps">
+        <action
+            android:id="@+id/action_mapsFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+</navigation>
