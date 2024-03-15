@@ -7,4 +7,18 @@
     <string name="alerts">Alerts</string>
     <string name="home">Home</string>
     <string name="api_key">2323b571a2b3fff232943282a6ec4b26</string>
+    <string name="celcuis_unit">°C</string>
+    <string name="clear_sky">Clear Sky</string>
+    <string name="search_for_place">Search For Places..</string>
+    <string name="fahrenheit_unit">°F</string>
+    <string name="hourly_forecast">Hourly Forecast</string>
+    <string name="current_conditions">Current Conditions</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="clouds">Clouds</string>
+    <string name="pascal">hPa</string>
+    <string name="percent">%</string>
+    <string name="meter_per_second">m/s</string>
+    <string name="five_day_forecast">Five Day Forecast</string>
 </resources>
