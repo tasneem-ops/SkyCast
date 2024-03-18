@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import android.location.Location
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.database.LocalDataSource
@@ -55,10 +54,6 @@ class HomeFragment : Fragment() {
             RemoteDataSourceImpl.getInstance()))
         weatherViewModel = ViewModelProvider(this, weatherViewModelFactory).get(WeatherViewModel::class.java)
         initRecyclerView()
-        binding.searchLayout.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToMapsFragment()
-            Navigation.findNavController(it).navigate(action)
-        }
         weatherViewModel.getWeatherForecast(30.001270, 31.432470, true)
         lifecycleScope.launch {
             weatherViewModel.responseDataState.collectLatest { result ->
