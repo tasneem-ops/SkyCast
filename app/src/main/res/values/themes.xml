@@ -4,7 +4,6 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="Theme.SkyCast" parent="Base.Theme.SkyCast" />

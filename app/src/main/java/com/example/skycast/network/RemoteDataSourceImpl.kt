@@ -26,8 +26,7 @@ class RemoteDataSourceImpl private constructor() : RemoteDataSource {
         lang: String
     ) : Flow<Forecast> {
         return flow{
-            RetrofitHelper.retrofitService.getForecast(lat, lng, apiKey, units, lang).body()
-                ?.let { emit(it) }
+            RetrofitHelper.retrofitService.getForecast(lat, lng, apiKey, units, lang)
         }
     }
 }

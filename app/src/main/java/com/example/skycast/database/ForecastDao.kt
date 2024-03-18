@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ForecastDao {
-    @Query("SELECT * FROM hour_forecast ORDER BY dt ASC")
+    @Query("SELECT * FROM hour_forecast")
     fun getAllForecast() : Flow<List<HourForecast>>
 
     @Query("SELECT * FROM hour_forecast ORDER BY dt ASC LIMIT 8")
