@@ -16,6 +16,5 @@ class MainActivity : AppCompatActivity() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         navigationView = findViewById(R.id.bottom_nav_view)
         NavigationUI.setupWithNavController(navigationView, navController)
-        getString(R.string.api_key)
     }
 }
