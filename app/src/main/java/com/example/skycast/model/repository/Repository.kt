@@ -9,10 +9,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: ILocalDataSource) {
+class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: ILocalDataSource) :
+    IRepository {
     companion object{
         @Volatile
         private var INSTANCE: Repository? = null
@@ -24,7 +26,7 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
             }
         }
     }
-    fun getDailyWeather(latLng: LatLng, apiKey: String,lang : String, forceUpdate : Boolean = false) : Flow<List<DailyWeather>> {
+    override fun getDailyWeather(latLng: LatLng, apiKey: String, lang : String, forceUpdate : Boolean) : Flow<List<DailyWeather>> {
         if(forceUpdate){
             return remoteDataSource.getDailyForecast(latLng, apiKey, "metric", lang)
         }
@@ -33,7 +35,7 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
             return localDataSource.getDailyWeather(dt, lang)
         }
     }
-    fun getHourlyWeather(latLng: LatLng, apiKey: String, lang: String, forceUpdate: Boolean) : Flow<List<HourlyWeather>>{
+    override fun getHourlyWeather(latLng: LatLng, apiKey: String, lang: String, forceUpdate: Boolean) : Flow<List<HourlyWeather>>{
         if(forceUpdate){
             return remoteDataSource.getHourlyForecast(latLng, apiKey, "metric", lang)
         }
@@ -42,7 +44,7 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
             return localDataSource.getHourlyWeatherForecast(dt, lang)
         }
     }
-    fun getCurrentWeather(latLng: LatLng, apiKey: String, lang: String, forceUpdate: Boolean) : Flow<HourlyWeather?>{
+    override fun getCurrentWeather(latLng: LatLng, apiKey: String, lang: String, forceUpdate: Boolean) : Flow<HourlyWeather?>{
         if(forceUpdate){
             return remoteDataSource.getCurrentForecast(latLng, apiKey, "metric", lang)
         }
@@ -51,7 +53,7 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
             return localDataSource.getCurrentWeatherForecast(dt, lang)
         }
     }
-    suspend fun updateWeatherCache(latLng: LatLng, apiKey: String){
+    override suspend fun updateWeatherCache(latLng: LatLng, apiKey: String){
         val clearDatabaseJob = GlobalScope.launch {
             localDataSource.clearDailyWeather()
             localDataSource.clearHourlyWeather()

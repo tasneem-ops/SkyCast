@@ -5,11 +5,13 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
 }
 buildscript {
+    val agp_version by extra("8.2.0")
     repositories {
         google()
     }
     dependencies {
         val nav_version = "2.7.7"
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version")
+        classpath("com.android.tools.build:gradle:$agp_version")
     }
 }

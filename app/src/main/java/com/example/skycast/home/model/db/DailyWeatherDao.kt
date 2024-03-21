@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DailyWeatherDao {
-    @Query("SELECT * FROM daily_weather WHERE dt >= :currentDt AND lang = :lang ORDER BY dt ASC")
+    @Query("SELECT * FROM daily_weather WHERE dt >= :currentDt AND lang = :lang ORDER BY dt ASC LIMIT 7")
     fun getDailyWeatherForecast(currentDt : Int, lang : String) : Flow<List<DailyWeather>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
