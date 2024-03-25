@@ -17,32 +17,35 @@
             android:id="@+id/action_homeFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
         <argument
-            android:name="latitude"
-            app:argType="float" />
+            android:name="lat"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="lng"
+            app:argType="float"
+            android:defaultValue="0.0" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.example.skycast.favorites.view.FavoritesFragment"
         android:label="Favorites"
         tools:layout="@layout/fragment_favorites">
+        <argument
+            android:name="lng"
+            app:argType="float" />
+        <argument
+            android:name="lat"
+            app:argType="float" />
         <action
-            android:id="@+id/action_favoritesFragment_to_addFavoriteFragment"
-            app:destination="@id/addFavoriteFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/addFavoriteFragment"
-        android:name="com.example.skycast.favorites.view.AddFavoriteFragment"
-        android:label="Add Favorite"
-        tools:layout="@layout/fragment_add_favorite">
-        <action
-            android:id="@+id/action_addFavoriteFragment_to_favoritesFragment"
-            app:destination="@id/favoritesFragment" />
-        <action
-            android:id="@+id/action_addFavoriteFragment_to_mapsFragment"
+            android:id="@+id/action_favoritesFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
+        <argument
+            android:name="city"
+            app:argType="string"
+            app:nullable="true" />
         <action
-            android:id="@+id/action_addFavoriteFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
+            android:id="@+id/action_favoritesFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/alertFragment"
@@ -67,6 +70,14 @@
         <action
             android:id="@+id/action_addAlertFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+        <argument
+            android:name="lat"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="lng"
+            app:argType="float"
+            android:defaultValue="0.0" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -97,5 +108,18 @@
         <action
             android:id="@+id/action_mapsFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_addAlertFragment"
+            app:destination="@id/addAlertFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="type"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_mapsFragment_to_favoritesFragment"
+            app:destination="@id/favoritesFragment" />
     </fragment>
 </navigation>
