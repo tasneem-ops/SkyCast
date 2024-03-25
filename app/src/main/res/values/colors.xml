@@ -5,4 +5,5 @@
     <color name="colorPrimary">#176B87</color>
     <color name="colorSecondary">#86B6F6</color>
     <color name="backgroundTint">#EEF5FF</color>
+    <color name="green">#9acd32</color>
 </resources>

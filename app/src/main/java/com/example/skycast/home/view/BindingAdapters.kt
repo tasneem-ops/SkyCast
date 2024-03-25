@@ -1,17 +1,12 @@
 package com.example.skycast.home.view
 
+import android.location.Geocoder
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.skycast.R
-
-//@BindingAdapter("description")
-//fun showWeatherStatusImage(view : ImageView, description : String?){
-//    val statusIconMap : HashMap<String, Int> = hashMapOf("clear sky" to R.drawable.sunny, "few clouds" to R.drawable.few_clouds,
-//        "mist" to R.drawable.mist, "scattered clouds" to R.drawable.scattered_clouds, "broken clouds" to R.drawable.many_clouds,
-//        "shower rain" to R.drawable.rain, "rain" to R.drawable.light_rain, "thunderstorm" to R.drawable.thunderstorm, "snow" to R.drawable.snow)
-//
-//    view.setImageResource(statusIconMap.get(description) ?: R.drawable.few_clouds)
-//}
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @BindingAdapter("weatherIcon")
 fun showWeatherStatusImage(view: ImageView, weatherIcon : Int){
@@ -48,3 +43,25 @@ fun showWeatherStatusImage(view: ImageView, weatherIcon : Int){
     }
     view.setImageResource(iconId)
 }
+
+@BindingAdapter("dateTime")
+fun setDateTimeText(view: TextView, dateTime : Long){
+    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(dateTime)
+}
+@BindingAdapter("twoLineDateTime")
+fun setTwoLineDateTimeText(view: TextView, dateTime : Long){
+    view.text = SimpleDateFormat("hh:mm\nEE dd/MM/yy", Locale.US).format(dateTime)
+}
+@BindingAdapter("dateTime")
+fun setDateTimeText(view: TextView, dateTime : Int){
+    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(dateTime*1000L)
+}
+//@BindingAdapter("latitude", "longitude")
+//fun latLngToCityName(view: TextView, latitude : Double, longitude: Double){
+//    val address = Geocoder(view.context).getFromLocation(latitude, longitude, 1)
+//    if(address == null)
+//        return
+//    if (address.isEmpty())
+//        return
+//    view.text = address.get(0)?.locality
+//}

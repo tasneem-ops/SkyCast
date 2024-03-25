@@ -1,5 +1,6 @@
 package com.example.skycast.model.network
 
+import com.example.skycast.alert.model.dto.Alert
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
 import com.google.android.gms.maps.model.LatLng
@@ -26,4 +27,6 @@ interface IRemoteDataSource {
         units: String,
         lang: String
     ): Flow<HourlyWeather?>
+    fun getAlert(latLng: LatLng, apiKey: String, units: String, lang: String): Flow<Alert>
+
 }
