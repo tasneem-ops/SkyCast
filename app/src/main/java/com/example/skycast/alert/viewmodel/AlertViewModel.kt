@@ -2,11 +2,13 @@ package com.example.skycast.alert.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.skycast.alert.alarm_manager.AlarmScheduler
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.model.dto.NotificationType
-import com.example.skycast.home.model.dto.WeatherResult
 import com.example.skycast.model.Response
+import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.repository.IRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,10 +17,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-class AlertViewModel(private val repository: IRepository) : ViewModel() {
+class AlertViewModel(private val repository: IRepository, private val settingsDataSource: UserSettingsDataSource) : ViewModel() {
     private val _responseDataState = MutableStateFlow<Response<List<AlertDTO>>>(Response.Loading())
     val respnseDataState: StateFlow<Response<List<AlertDTO>>> = _responseDataState.asStateFlow()
-    var alert = AlertDTO(0.0, 0.0, "", 0L, 0L, true, NotificationType.NOTIFICATION)
+    val lang = settingsDataSource.getPreferredLanguage()
+    var alert = AlertDTO(0.0, 0.0, "", 0L, 0L,
+        true, NotificationType.NOTIFICATION, lang)
     private val _saveState = MutableStateFlow<Response<String>>(Response.Loading())
     val saveState : StateFlow<Response<String>> = _saveState.asStateFlow()
     fun getAlerts(){
@@ -35,7 +39,7 @@ class AlertViewModel(private val repository: IRepository) : ViewModel() {
 
     fun addAlert(){
         if(validateData()){
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 repository.addAlert(alert)
                 _saveState.value = Response.Success("Success")
             }

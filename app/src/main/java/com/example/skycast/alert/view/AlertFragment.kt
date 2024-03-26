@@ -12,12 +12,14 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
+import com.example.skycast.alert.alarm_manager.AlarmScheduler
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.viewmodel.AlertViewModel
 import com.example.skycast.alert.viewmodel.AlertViewModelFactory
 import com.example.skycast.databinding.FragmentAlertBinding
 import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
+import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
 import com.example.skycast.model.repository.Repository
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +41,8 @@ class AlertFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = AlertViewModelFactory((Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(requireContext()))))
+        viewModelFactory = AlertViewModelFactory((Repository.getInstance(RemoteDataSource.getInstance(),
+            LocalDataSource.getInstance(requireContext()))), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(AlertViewModel::class.java)
         initRecyclerView()
         binding.addAlertFab.setOnClickListener {
@@ -69,6 +72,7 @@ class AlertFragment : Fragment() {
             Snackbar.make(binding.alertsRecyclerView, "Delete Alert?", Snackbar.LENGTH_SHORT)
                 .setAction("Delete"){
                     viewModel.deleteAlert(alert)
+                    AlarmScheduler(requireContext()).cancel(alert)
                 }
                 .show()
 
