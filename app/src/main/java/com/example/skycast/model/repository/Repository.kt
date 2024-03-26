@@ -1,11 +1,18 @@
 package com.example.skycast.model.repository
 
+import com.example.skycast.alert.model.dto.Alert
+import com.example.skycast.alert.model.dto.AlertDTO
+import com.example.skycast.favorites.model.dto.FavDTO
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
+import com.example.skycast.location.model.Place
 import com.example.skycast.model.local.ILocalDataSource
 import com.example.skycast.model.network.IRemoteDataSource
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -54,7 +61,9 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
         }
     }
     override suspend fun updateWeatherCache(latLng: LatLng, apiKey: String){
-        val clearDatabaseJob = GlobalScope.launch {
+        val job = SupervisorJob()
+        val scope = CoroutineScope(Dispatchers.IO + job)
+        val clearDatabaseJob = scope.launch {
             localDataSource.clearDailyWeather()
             localDataSource.clearHourlyWeather()
         }
@@ -75,7 +84,44 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
         dailyArFlow.collectLatest {
             localDataSource.insertDailyWeather(*it.toTypedArray())
         }
+        job.cancel()
     }
 
+    override fun getAlerts(): Flow<List<AlertDTO>> {
+        return localDataSource.getAlerts()
+    }
+
+    override suspend fun addAlert(alertDTO: AlertDTO): Long {
+        return localDataSource.addAlert(alertDTO)
+    }
+
+    override suspend fun deleteAlert(alertDTO: AlertDTO): Int {
+        return localDataSource.delete(alertDTO)
+    }
+
+    override suspend fun addFav(favDTO: FavDTO): Long {
+        return localDataSource.addFav(favDTO)
+    }
+
+    override fun getAllFav(): Flow<List<FavDTO>> {
+        return localDataSource.getAllFav()
+    }
+
+    override suspend fun deleteFav(favDTO: FavDTO): Int {
+        return localDataSource.deleteFav(favDTO)
+    }
+
+    override fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert> {
+        return remoteDataSource.getAlert(latLng, apiKey)
+    }
+
+    override fun getSearchSuggestions(
+        query: String,
+        format: String,
+        lang: String,
+        limit: Int
+    ): Flow<List<Place>> {
+        return remoteDataSource.getSearchSuggestions(query, format, lang, limit)
+    }
 
 }
