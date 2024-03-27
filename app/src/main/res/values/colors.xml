@@ -2,8 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#176B87</color>
-    <color name="colorSecondary">#86B6F6</color>
-    <color name="backgroundTint">#EEF5FF</color>
+    <color name="colorPrimary">#D5BDAF</color>
+    <color name="colorSecondary">#E3D5CA</color>
+    <color name="cardColor">#F5EBE0</color>
+    <color name="backgroundTint">#EDEDE9</color>
     <color name="green">#9acd32</color>
 </resources>

@@ -5,8 +5,6 @@ import com.example.skycast.home.model.dto.HourlyWeather
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.concurrent.TimeUnit
-
 class WeatherRemoteDataSource private constructor(){
     companion object{
         @Volatile

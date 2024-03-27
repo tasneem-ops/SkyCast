@@ -55,42 +55,46 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-        activity?.let {
-            (it as AppCompatActivity).supportActionBar?.hide()
-        }
         val button = view.findViewById<FloatingActionButton>(R.id.map_save)
         button.setOnClickListener {
-            when (arguments?.getInt("type")) {
-                HOME_TYPE -> {
-                    val action = MapsFragmentDirections.actionMapsFragmentToHomeFragment(
-                        chosenLatLng.latitude.toFloat(),
-                        chosenLatLng.longitude.toFloat()
-                    )
-                    Navigation.findNavController(it).navigate(action)
-                }
-
-                FAV_TYPE -> {
-                    val action = MapsFragmentDirections.actionMapsFragmentToFavoritesFragment(
-                        chosenLatLng.latitude.toFloat(),
-                        chosenLatLng.longitude.toFloat(),
-                        latLngToCityName(chosenLatLng.latitude, chosenLatLng.longitude)
-                    )
-                    Navigation.findNavController(it).navigate(action)
-                }
-
-                ALERT_TYPE -> {
-                    val action = MapsFragmentDirections.actionMapsFragmentToAddAlertFragment(
-                        chosenLatLng.latitude.toFloat(),
-                        chosenLatLng.longitude.toFloat()
-                    )
-                    Navigation.findNavController(it).navigate(action)
-                }
-                else ->{
-
-                }
-
-            }
+            val action = MapsFragmentDirections.actionMapsFragmentToSearchFragment()
+            Navigation.findNavController(it).navigate(action)
         }
+//        button.setOnClickListener {
+//            when (arguments?.getInt("type")) {
+//                HOME_TYPE -> {
+//                    val action = MapsFragmentDirections.actionMapsFragmentToHomeFragment(
+//                        chosenLatLng.latitude.toFloat(),
+//                        chosenLatLng.longitude.toFloat()
+//                    )
+//                    Navigation.findNavController(it).navigate(action)
+//                }
+//
+//                FAV_TYPE -> {
+//                    val action = MapsFragmentDirections.actionMapsFragmentToFavoritesFragment(
+//                        chosenLatLng.latitude.toFloat(),
+//                        chosenLatLng.longitude.toFloat(),
+//                        latLngToCityName(chosenLatLng.latitude, chosenLatLng.longitude)
+//                    )
+//                    Navigation.findNavController(it).navigate(action)
+//                }
+//
+//                ALERT_TYPE -> {
+//                    val action = MapsFragmentDirections.actionMapsFragmentToAddAlertFragment(
+//                        chosenLatLng.latitude.toFloat(),
+//                        chosenLatLng.longitude.toFloat()
+//                    )
+//                    Navigation.findNavController(it).navigate(action)
+//                }
+//                SEARCH_TYPE ->{
+//
+//                }
+//                else ->{
+//
+//                }
+//
+//            }
+//        }
     }
     fun latLngToCityName( latitude : Double, longitude: Double) : String?{
         try {
@@ -108,6 +112,7 @@ class MapsFragment : Fragment() {
         }
     }
     companion object{
+        const val SEARCH_TYPE = 4
         const val ALERT_TYPE = 3
         const val FAV_TYPE = 2
         const val HOME_TYPE = 1

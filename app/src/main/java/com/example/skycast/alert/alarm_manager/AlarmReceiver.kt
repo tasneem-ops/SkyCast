@@ -27,8 +27,6 @@ class AlarmReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.i(TAG, "onReceive: ")
         val item : AlertDTO = intent?.extras?.getParcelable("DATA") ?: return
-        val intent = Intent(context, AlertService::class.java)
-        intent.putExtra("DATA", item)
         if (context == null){
             return
         }

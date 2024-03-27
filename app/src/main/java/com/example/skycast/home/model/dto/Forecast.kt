@@ -1,5 +1,7 @@
 package com.example.skycast.home.model.dto
 
+import com.example.skycast.alert.model.dto.Alert
+
 data class Forecast(
     val lat: Double,
     val lon: Double,
@@ -7,5 +9,5 @@ data class Forecast(
     val timezone_offset: Int,
     val current: Current,
     val hourly: List<Hourly>,
-    val daily: List<Daily>,
+    val daily: List<Daily>
 )

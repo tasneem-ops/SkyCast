@@ -3,13 +3,14 @@
     <style name="Base.Theme.SkyCast" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="colorPrimary">#176B87</item>
-        <item name="colorSecondary">#86B6F6</item>
-        <item name="backgroundTint">#EEF5FF</item>
-        <item name="backgroundColor">#EEF5FF</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="backgroundTint">@color/backgroundTint</item>
+        <item name="backgroundColor">@color/backgroundTint</item>
         <item name="background">@color/backgroundTint</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondaryVariant">#B4D4FF</item>
+        <item name="cardBackgroundColor">@color/cardColor</item>
+        <item name="cardCornerRadius">24dp</item>
         <item name="android:statusBarColor">@color/backgroundTint</item>
     </style>
 

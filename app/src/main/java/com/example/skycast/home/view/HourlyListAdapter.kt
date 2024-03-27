@@ -21,7 +21,7 @@ class HourlyListAdapter (val unit : String) : ListAdapter<HourlyWeather, HourVie
     override fun onBindViewHolder(holder: HourViewHolder, position: Int) {
         holder.binding.weather = getItem(position)
         holder.binding.unit = unit
-        holder.binding.timeText.text = SimpleDateFormat("HH:mm aa" , Locale.US).format(getItem(position).dt * 1000L)
+        holder.binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.US).format(getItem(position).dt * 1000L)
     }
 }
 class HourViewHolder(val binding : HourForecastItemBinding): RecyclerView.ViewHolder(binding.root)

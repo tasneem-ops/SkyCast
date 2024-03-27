@@ -8,7 +8,7 @@ class UserSettingsDataSource private constructor(val context: Context) {
 
     fun getLocationSource() : String?{
         return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
-            .getString(LOCATION_SOURCE, SOURCE_GPS)
+            .getString(LOCATION_SOURCE, SOURCE_UNKNOWN)
     }
     fun setLocationSource(source: String){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
@@ -79,6 +79,7 @@ class UserSettingsDataSource private constructor(val context: Context) {
         private const val LOCATION_SOURCE = "LOCATION_SOURCE"
         const val SOURCE_MAP = "MAP"
         const val SOURCE_GPS = "GPS"
+        const val SOURCE_UNKNOWN = "UNKNOWN"
 
         private const val LOCATION_LAT = "LOCATION_LAT"
         private const val LOCATION_LNG = "LOCATION_LNG"

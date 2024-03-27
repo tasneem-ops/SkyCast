@@ -6,7 +6,7 @@ import com.example.skycast.model.local.UserSettingsDataSource
 import com.google.android.gms.maps.model.LatLng
 
 class SettingsViewModel(private val settingsDataSource: UserSettingsDataSource) : ViewModel(){
-    fun getLocationSource() : String{
+    fun getLocationSource() : String?{
         return settingsDataSource.getLocationSource()
     }
     fun setLocationSource(source: String){
@@ -34,7 +34,7 @@ class SettingsViewModel(private val settingsDataSource: UserSettingsDataSource) 
         settingsDataSource.setSpeedUnit(unit)
     }
 
-    fun getSavedLocation() : LatLng?{
+    fun getSavedLocation() : LatLng{
         return settingsDataSource.getSavedLocation()
     }
     fun setSavedLocation(latLng: LatLng){

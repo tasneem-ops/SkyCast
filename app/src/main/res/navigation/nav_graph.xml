@@ -24,6 +24,10 @@
             android:name="lng"
             app:argType="float"
             android:defaultValue="0.0" />
+        <argument
+            android:name="cache"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"

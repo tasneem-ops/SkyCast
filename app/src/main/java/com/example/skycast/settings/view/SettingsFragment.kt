@@ -2,6 +2,7 @@ package com.example.skycast.settings.view
 
 import android.os.Bundle
 import android.provider.ContactsContract.Data
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import com.example.skycast.MainActivity
 import com.example.skycast.R
 import com.example.skycast.databinding.FragmentSettingsBinding
 import com.example.skycast.model.local.UserSettingsDataSource
@@ -45,12 +47,21 @@ class SettingsFragment : Fragment() {
         binding.languageGroup.setOnCheckedChangeListener { radioGroup, i ->
             when(i){
                 R.id.arabicRadio -> {
-                    viewModel.setPreferredLanguage(ARABIC)
+                    if(viewModel.getPreferredLanguage() != ARABIC){
+                        viewModel.setPreferredLanguage(ARABIC)
+                        Log.i("TAG", "Recreate: ")
+                        requireActivity().recreate()
+                    }
                 }
                 R.id.englishRadio -> {
-                    viewModel.setPreferredLanguage(ENGLISH)
+                    if(viewModel.getPreferredLanguage() != ENGLISH){
+                        viewModel.setPreferredLanguage(ENGLISH)
+                        Log.i("TAG", "Recreate: ")
+                        requireActivity().recreate()
+                    }
                 }
         }
+
         }
         binding.locationGroup.setOnCheckedChangeListener { radioGroup, i ->
             when(i){

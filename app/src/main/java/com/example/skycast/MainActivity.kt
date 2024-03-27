@@ -1,5 +1,12 @@
 package com.example.skycast
 
+import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +16,9 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.example.skycast.databinding.ActivityMainBinding
+import com.example.skycast.model.local.UserSettingsDataSource
+import com.google.android.material.snackbar.Snackbar
+import java.util.Locale
 
 
 private const val TAG = "MainActivity"
@@ -18,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setAppLocale()
         setSupportActionBar(binding.materialToolbar)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         binding.navigationView.bringToFront()
@@ -61,8 +72,39 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        val connectivityManager = getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
+    val networkRequest = NetworkRequest.Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        .build()
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        // network is available for use
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            Snackbar.make(binding.navigationView, "Back Online", Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(resources.getColor(R.color.green))
+                .show()
+        }
 
+        // Network capabilities have changed for the network
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
+            super.onCapabilitiesChanged(network, networkCapabilities)
+            val unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+        }
+
+        // lost network connection
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            Snackbar.make(binding.navigationView, "You are Currently Offline", Snackbar.LENGTH_SHORT)
+                .show()
+        }
+    }
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -70,4 +112,13 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+    fun setAppLocale() {
+        val settingsDataSource = UserSettingsDataSource.getInstance(applicationContext)
+        val locale = Locale(settingsDataSource.getPreferredLanguage())
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.locale = locale
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
+    }
+
 }

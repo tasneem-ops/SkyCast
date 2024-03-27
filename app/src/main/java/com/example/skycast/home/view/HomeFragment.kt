@@ -3,6 +3,12 @@ package com.example.skycast.home.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Geocoder
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -10,13 +16,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.bumptech.glide.Glide
 import com.example.skycast.R
 import com.example.skycast.databinding.FragmentHomeBinding
@@ -28,6 +44,7 @@ import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
 import com.example.skycast.model.repository.Repository
+import com.example.skycast.work.DailyCacheWorker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -38,11 +55,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
+private const val TAG = "HomeFragment"
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var weatherViewModel: WeatherViewModel
@@ -50,6 +71,7 @@ class HomeFragment : Fragment() {
     private lateinit var dayListAdapter: DailyListAdapter
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var connectionStatus = true
+    private var latLng : LatLng? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,11 +87,96 @@ class HomeFragment : Fragment() {
         weatherViewModel = ViewModelProvider(this, weatherViewModelFactory).get(WeatherViewModel::class.java)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         initRecyclerView()
-        //Step 1: Here We First See if user has a saved location already,
-        // Step2: If he has already get data for this location
-        //Step 3: Else see his preferences and get data based on that -- if gps get location & if needs permissions request it
-        //Step 4: if map ask him to open map and choose position
-        //Step 5 :if he hasn't got any preferences show dialog and on chosen go to step 3
+        if(arguments == null || arguments?.isEmpty == true ||
+            arguments?.getFloat("lat") == 0.0f || arguments?.getFloat("lng") == 0.0f){
+            Log.i(TAG, "onViewCreated: ")
+            if(weatherViewModel.isLocationSaved()){
+                weatherViewModel.getWeatherForecastForSavedLocation(getString(R.string.apiKey))
+            }
+            else{
+                val locationSource = weatherViewModel.getLocationPreferences()
+                when(locationSource){
+                    SOURCE_GPS ->{ getDataFromGPS() }
+                    SOURCE_MAP ->{
+                        val action = HomeFragmentDirections.actionHomeFragmentToMapsFragment(HOME_TYPE)
+                        Navigation.findNavController(binding.hourlyForecastText).navigate(action)
+                    }
+                    else ->{
+                        showInitialSetupDialog(R.string.choose_location_source)
+                    }
+                }
+            }
+        }
+        else{
+            val latitude = requireArguments().getFloat("lat").toDouble()
+            val longitude = requireArguments().getFloat("lng").toDouble()
+            if (requireArguments().getBoolean("cache") == true){
+                weatherViewModel.getWeatherForecast(LatLng(latitude, longitude), getString(R.string.apiKey),
+                    connectionStatus = connectionStatus, freshData = true)
+                weatherViewModel.updateLocationAndCache(LatLng(latitude, longitude), getString(R.string.apiKey))
+            }
+            else{
+                weatherViewModel.getWeatherForecast(LatLng(latitude, longitude), getString(R.string.apiKey),
+                    connectionStatus = connectionStatus, freshData = true)
+            }
+        }
+        requestDailyCache()
+    }
+
+    private fun requestDailyCache() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .setRequiresDeviceIdle(true)
+            .build()
+        val myWorkRequest: PeriodicWorkRequest = PeriodicWorkRequestBuilder<DailyCacheWorker>(
+            1, TimeUnit.DAYS, 1, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(requireContext())
+            .enqueueUniquePeriodicWork("1234",ExistingPeriodicWorkPolicy.KEEP,myWorkRequest)
+    }
+
+    private fun showInitialSetupDialog(titleResource : Int) {
+        var selected = 0
+        Log.i(TAG, "showInitialSetupDialog: ")
+        val builder: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(titleResource))
+            .setPositiveButton("Save") { _, which ->
+                takeAction(selected)
+            }
+            .setNegativeButton("Cancel") { _, which ->
+                takeAction(selected)
+            }
+            .setSingleChoiceItems(
+                arrayOf("GPS", "Map"), 0
+            ) { _, which ->
+                selected = which
+                Log.i(TAG, "showInitialSetupDialog: ${selected}")
+            }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+    private fun takeAction(selected : Int){
+        Log.i(TAG, "takeAction: $selected")
+        when(selected){
+            0 ->{
+                weatherViewModel.setLocationPreferences(SOURCE_GPS)
+                getDataFromGPS()
+            }
+            1 ->{
+                weatherViewModel.setLocationPreferences(SOURCE_MAP)
+                val action = HomeFragmentDirections.actionHomeFragmentToMapsFragment(HOME_TYPE)
+                Navigation.findNavController(binding.hourlyForecastText).navigate(action)
+            }
+            else ->{
+                showInitialSetupDialog(R.string.please_choose_location_source)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
         lifecycleScope.launch {
             weatherViewModel.respnseDataState.collectLatest { response ->
                 when(response){
@@ -85,21 +192,22 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        // For simplicity just assume he prefers gps
-        getDataFromGPS()
     }
     fun getForecastData(latLng: LatLng, connectionStatus : Boolean, freshData : Boolean){
         context?.getString(R.string.apiKey)?.let {
             weatherViewModel.getWeatherForecast(latLng, it,
                 true, freshData = true)
+            weatherViewModel.updateLocationAndCache(latLng, it)
         }
+
     }
     private fun getDataFromGPS(){
+        Log.i(TAG, "getDataFromGPS: ")
         if(checkPermissions()){
             getLocation()
         }
         else{
-            ActivityCompat.requestPermissions(requireActivity(),
+            requestPermissions(
                 arrayOf(
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -146,25 +254,56 @@ class HomeFragment : Fragment() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == My_LOCATION_PERMISSION_ID ) {
-            if ( grantResults[0]==PackageManager.PERMISSION_GRANTED){
+            if ( grantResults[0]==PackageManager.PERMISSION_GRANTED || grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                Log.i(TAG, "onRequestPermissionsResult: Accepted")
                 getLocation()
+            }
+            else{
+                Log.i(TAG, "onRequestPermissionsResult: Rejected")
+                showPermissionsNotGranted()
             }
         }
     }
-    fun showLoading(){
+
+    private fun showPermissionsNotGranted() {
+        val builder: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Permission Not Granted")
+            .setMessage("App Need Location Permission to Get Weather Data")
+            .setPositiveButton("OK") { _, which ->
+                requestPermissions(
+                    arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    My_LOCATION_PERMISSION_ID)
+            }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
+    private fun showLoading(){
         binding.loading.visibility = View.VISIBLE
         binding.layout.visibility = View.GONE
+        binding.error.visibility = View.GONE
     }
-    fun showError(){
-        binding.loading.visibility = View.VISIBLE
-        binding.layout.visibility = View.GONE
-    }
-    fun showData(data : WeatherResult){
+    private fun showError(){
+        binding.error.visibility = View.VISIBLE
         binding.loading.visibility = View.GONE
+        binding.layout.visibility = View.GONE
+    }
+    private fun showData(data : WeatherResult){
+        binding.loading.visibility = View.GONE
+        binding.error.visibility = View.GONE
         binding.layout.visibility = View.VISIBLE
         binding.currentWeather = data.current
         data.current?.let {
-            binding.timeText.text = SimpleDateFormat("HH:mm aa" , Locale.US).format(data.current!!.dt * 1000L)
+            binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.US).format(data.current!!.dt * 1000L)
+            val geocoder = activity?.let { it1 -> Geocoder(it1, Locale.getDefault()) }
+            latLng?.let {
+                val address = geocoder?.getFromLocation(it.latitude, it.longitude, 1)
+                binding.cityText.text = address?.get(0)?.locality
+            }
+
         }
         hourListAdapter.submitList(data.hourly)
         dayListAdapter.submitList(data.daily)
@@ -178,11 +317,14 @@ class HomeFragment : Fragment() {
         }
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cancellationToken)
             .addOnSuccessListener {
-                val latLng = LatLng(it.latitude, it.longitude)
-                getForecastData(latLng, connectionStatus, true)
+                latLng = LatLng(it.latitude, it.longitude)
+                getForecastData(latLng!!, connectionStatus, true)
             }
     }
     companion object{
         private const val My_LOCATION_PERMISSION_ID = 5005
+        const val SOURCE_MAP = "MAP"
+        const val SOURCE_GPS = "GPS"
+        const val HOME_TYPE = 1
     }
 }

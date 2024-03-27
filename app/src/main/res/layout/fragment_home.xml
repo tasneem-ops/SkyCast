@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/roboto_regular"
-                android:text="March 14 2024"
+                dateTime="@{currentWeather.dt}"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="@+id/city_text"
                 app:layout_constraintStart_toStartOf="@+id/city_text"
@@ -191,7 +191,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginStart="8dp"
-                    android:text=" " />
+                    android:text="@{String.valueOf(currentWeather.pressure)}" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -235,7 +235,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginStart="8dp"
-                    android:text=" " />
+                    android:text="@{String.valueOf(currentWeather.humidity)}" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -359,18 +359,17 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="48dp"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:lottie_fileName="animation.json"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"/>
             <TextView
-                android:id="@+id/error_msg"
+                android:id="@+id/loading_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -378,12 +377,41 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/animation"
                 android:layout_marginTop="32dp"
-                android:text="Loading"/>
+                android:text="@string/loading"/>
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/loading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="animation, error_msg"/>
+                app:constraint_referenced_ids="animation, loading_msg"
+                android:visibility="gone"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/error_animation"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:lottie_fileName="error_animation.json"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true" />
+            <TextView
+                android:id="@+id/error_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/error_animation"
+                android:layout_marginTop="32dp"
+                android:text="@string/couldnt_get_data"/>
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="error_animation, error_msg"
+                android:visibility="gone"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>
