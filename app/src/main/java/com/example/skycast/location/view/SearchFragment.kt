@@ -14,7 +14,6 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
-import com.example.skycast.alert.alarm_manager.DATA_NOTIFICATION_ID
 import com.example.skycast.databinding.FragmentSearchBinding
 import com.example.skycast.location.viewmodel.LocationViewModel
 import com.example.skycast.location.viewmodel.LocationViewModelFactory
@@ -22,9 +21,8 @@ import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.Repository
+import com.example.skycast.model.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
@@ -45,7 +43,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = LocationViewModelFactory(Repository.getInstance(RemoteDataSource.getInstance(),
+        viewModelFactory = LocationViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
             LocalDataSource.getInstance(requireContext())), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(this, viewModelFactory).get(LocationViewModel::class.java)
         initView()

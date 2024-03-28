@@ -79,4 +79,25 @@ dependencies {
     implementation ("com.airbnb.android:lottie:6.4.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
+    // hamcrest
+    testImplementation ("org.hamcrest:hamcrest:2.2")
+    testImplementation ("org.hamcrest:hamcrest-library:2.2")
+    androidTestImplementation ("org.hamcrest:hamcrest:2.2")
+    androidTestImplementation ("org.hamcrest:hamcrest-library:2.2")
+
+
+    // AndroidX and Robolectric
+    testImplementation ("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation ("androidx.test:core-ktx:1.5.0")
+    testImplementation ("org.robolectric:robolectric:4.8")
+
+    // InstantTaskExecutorRule
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+    androidTestImplementation ("androidx.arch.core:core-testing:2.2.0")
+
+    //kotlinx-coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+
 }

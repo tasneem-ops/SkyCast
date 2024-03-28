@@ -4,60 +4,60 @@ import android.content.Context
 import com.google.android.gms.maps.model.LatLng
 import org.intellij.lang.annotations.Language
 
-class UserSettingsDataSource private constructor(val context: Context) {
+class UserSettingsDataSource private constructor(val context: Context) : IUserSettingsDataSource {
 
-    fun getLocationSource() : String?{
+    override fun getLocationSource() : String?{
         return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getString(LOCATION_SOURCE, SOURCE_UNKNOWN)
     }
-    fun setLocationSource(source: String){
+    override fun setLocationSource(source: String){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .edit()
             .putString(LOCATION_SOURCE, source)
             .apply()
     }
 
-    fun getPreferredLanguage() : String{
+    override fun getPreferredLanguage() : String{
         return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getString(LANGUAGE, ENGLISH) ?: ENGLISH
     }
-    fun setPreferredLanguage(language: String){
+    override fun setPreferredLanguage(language: String){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .edit()
             .putString(LANGUAGE, language)
             .apply()
     }
 
-    fun getTempUnit() : String{
+    override fun getTempUnit() : String{
         return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getString(TEMP_UNIT, UNIT_CELSIUS) ?: UNIT_CELSIUS
     }
-    fun setTempUnit(unit: String){
+    override fun setTempUnit(unit: String){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .edit()
             .putString(TEMP_UNIT, unit)
             .apply()
     }
 
-    fun getSpeedUnit() : String{
+    override fun getSpeedUnit() : String{
         return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getString(SPEED_UNIT, UNIT_MPS) ?: UNIT_MPS
     }
-    fun setSpeedUnit(unit: String){
+    override fun setSpeedUnit(unit: String){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .edit()
             .putString(SPEED_UNIT, unit)
             .apply()
     }
 
-    fun getSavedLocation() : LatLng{
+    override fun getSavedLocation() : LatLng{
         val latitude = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getFloat(LOCATION_LAT, 0.0f)
         val longitude = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .getFloat(LOCATION_LNG, 0.0f)
         return LatLng(latitude.toDouble(), longitude.toDouble())
     }
-    fun setSavedLocation(latLng: LatLng){
+    override fun setSavedLocation(latLng: LatLng){
         context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
             .edit()
             .putFloat(LOCATION_LAT, latLng.latitude.toFloat())

@@ -9,25 +9,27 @@ import com.example.skycast.location.model.Place
 import com.example.skycast.model.local.ILocalDataSource
 import com.example.skycast.model.network.IRemoteDataSource
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
-class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: ILocalDataSource) :
-    IRepository {
+class WeatherRepository(val remoteDataSource: IRemoteDataSource,
+                        val localDataSource: ILocalDataSource,
+                        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
+    IWeatherRepository {
     companion object{
         @Volatile
-        private var INSTANCE: Repository? = null
-        fun getInstance (remoteDataSource: IRemoteDataSource,localDataSource: ILocalDataSource): Repository {
+        private var INSTANCE: WeatherRepository? = null
+        fun getInstance (remoteDataSource: IRemoteDataSource,localDataSource: ILocalDataSource,
+                         ioDispatcher: CoroutineDispatcher = Dispatchers.IO): WeatherRepository {
             return INSTANCE ?: synchronized(this){
-                val instance = Repository(remoteDataSource, localDataSource)
+                val instance = WeatherRepository(remoteDataSource, localDataSource, ioDispatcher)
                 INSTANCE = instance
                 instance
             }
@@ -60,14 +62,15 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
             return localDataSource.getCurrentWeatherForecast(dt, lang)
         }
     }
-    override suspend fun updateWeatherCache(latLng: LatLng, apiKey: String){
-        val job = SupervisorJob()
-        val scope = CoroutineScope(Dispatchers.IO + job)
-        val clearDatabaseJob = scope.launch {
-            localDataSource.clearDailyWeather()
-            localDataSource.clearHourlyWeather()
-        }
-        clearDatabaseJob.join()
+    override suspend fun updateWeatherCache(latLng: LatLng, apiKey: String) = withContext(ioDispatcher){
+//        val job = SupervisorJob()
+//        val scope = CoroutineScope(ioDispatcher + job)
+//        val clearDatabaseJob = scope.launch {
+//
+//        }
+//        clearDatabaseJob.join()
+        localDataSource.clearDailyWeather()
+        localDataSource.clearHourlyWeather()
         val hourlyEnFlow = remoteDataSource.getHourlyForecast(latLng, apiKey, "metric", "en")
         hourlyEnFlow.collectLatest {
             localDataSource.insertHourlyWeather(*it.toTypedArray())
@@ -84,31 +87,31 @@ class Repository(val remoteDataSource: IRemoteDataSource, val localDataSource: I
         dailyArFlow.collectLatest {
             localDataSource.insertDailyWeather(*it.toTypedArray())
         }
-        job.cancel()
+//        job.cancel()
     }
 
     override fun getAlerts(): Flow<List<AlertDTO>> {
         return localDataSource.getAlerts()
     }
 
-    override suspend fun addAlert(alertDTO: AlertDTO): Long {
-        return localDataSource.addAlert(alertDTO)
+    override suspend fun addAlert(alertDTO: AlertDTO): Long = withContext<Long>(ioDispatcher) {
+        return@withContext localDataSource.addAlert(alertDTO)
     }
 
-    override suspend fun deleteAlert(alertDTO: AlertDTO): Int {
-        return localDataSource.delete(alertDTO)
+    override suspend fun deleteAlert(alertDTO: AlertDTO): Int  = withContext(ioDispatcher){
+        return@withContext localDataSource.delete(alertDTO)
     }
 
-    override suspend fun addFav(favDTO: FavDTO): Long {
-        return localDataSource.addFav(favDTO)
+    override suspend fun addFav(favDTO: FavDTO): Long = withContext(ioDispatcher){
+        return@withContext localDataSource.addFav(favDTO)
     }
 
     override fun getAllFav(): Flow<List<FavDTO>> {
         return localDataSource.getAllFav()
     }
 
-    override suspend fun deleteFav(favDTO: FavDTO): Int {
-        return localDataSource.deleteFav(favDTO)
+    override suspend fun deleteFav(favDTO: FavDTO): Int = withContext(ioDispatcher){
+        return@withContext localDataSource.deleteFav(favDTO)
     }
 
     override fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert> {

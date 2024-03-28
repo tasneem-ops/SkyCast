@@ -19,7 +19,7 @@ import com.example.skycast.databinding.FragmentAddAlertBinding
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.Repository
+import com.example.skycast.model.repository.WeatherRepository
 import java.util.Calendar
 
 private const val TAG = "AddAlertFragment"
@@ -39,7 +39,7 @@ class AddAlertFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = AlertViewModelFactory(Repository.getInstance(RemoteDataSource.getInstance(),
+        viewModelFactory = AlertViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
             LocalDataSource.getInstance(requireContext())), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(AlertViewModel::class.java)
         val latitude = arguments?.getFloat("lat")?.toDouble()

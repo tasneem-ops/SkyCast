@@ -3,22 +3,14 @@ package com.example.skycast.home.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Geocoder
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -32,8 +24,6 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import com.bumptech.glide.Glide
 import com.example.skycast.R
 import com.example.skycast.databinding.FragmentHomeBinding
 import com.example.skycast.home.model.dto.WeatherResult
@@ -43,20 +33,16 @@ import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.Repository
+import com.example.skycast.model.repository.WeatherRepository
 import com.example.skycast.work.DailyCacheWorker
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -82,7 +68,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weatherViewModelFactory = WeatherViewModelFactory(Repository(RemoteDataSource.getInstance(), LocalDataSource.getInstance(requireContext())),
+        val weatherViewModelFactory = WeatherViewModelFactory(WeatherRepository(RemoteDataSource.getInstance(), LocalDataSource.getInstance(requireContext())),
             UserSettingsDataSource.getInstance(requireContext()))
         weatherViewModel = ViewModelProvider(this, weatherViewModelFactory).get(WeatherViewModel::class.java)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())

@@ -2,20 +2,19 @@ package com.example.skycast.location.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.skycast.home.model.dto.WeatherResult
 import com.example.skycast.location.model.Place
 import com.example.skycast.model.Response
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.local.UserSettingsDataSource.Companion.ARABIC
 import com.example.skycast.model.local.UserSettingsDataSource.Companion.ENGLISH
-import com.example.skycast.model.repository.IRepository
+import com.example.skycast.model.repository.IWeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class LocationViewModel(private val repository: IRepository,
+class LocationViewModel(private val repository: IWeatherRepository,
                         private val settingsDataSource: UserSettingsDataSource
 ) : ViewModel() {
     private val _responseDataState = MutableStateFlow<Response<List<Place>>>(Response.Loading())

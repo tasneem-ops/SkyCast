@@ -21,7 +21,7 @@ import com.example.skycast.favorites.viewmodel.FavoritesViewModelFactory
 import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.Repository
+import com.example.skycast.model.repository.WeatherRepository
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -41,7 +41,7 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = FavoritesViewModelFactory(Repository.getInstance(RemoteDataSource.getInstance(),
+        viewModelFactory = FavoritesViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
             LocalDataSource.getInstance(requireContext())))
         viewModel = ViewModelProvider(this, viewModelFactory).get(FavoritesViewModel::class.java)
         initRecylerView()

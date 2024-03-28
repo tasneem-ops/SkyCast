@@ -21,7 +21,7 @@ import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.Repository
+import com.example.skycast.model.repository.WeatherRepository
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -41,7 +41,7 @@ class AlertFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = AlertViewModelFactory((Repository.getInstance(RemoteDataSource.getInstance(),
+        viewModelFactory = AlertViewModelFactory((WeatherRepository.getInstance(RemoteDataSource.getInstance(),
             LocalDataSource.getInstance(requireContext()))), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(AlertViewModel::class.java)
         initRecyclerView()

@@ -9,7 +9,7 @@ import com.example.skycast.location.model.Place
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
-interface IRepository {
+interface IWeatherRepository {
     fun getDailyWeather(
         latLng: LatLng,
         apiKey: String,
