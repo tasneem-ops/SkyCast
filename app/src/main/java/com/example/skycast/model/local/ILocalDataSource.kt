@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface ILocalDataSource {
     fun getDailyWeather(dt: Int, lang : String): Flow<List<DailyWeather>>
+    fun getAllDailyWeather(): Flow<List<DailyWeather>>
     suspend fun clearDailyWeather(): Int
     suspend fun insertDailyWeather(vararg dailyWeather: DailyWeather): List<Long>
     fun getHourlyWeatherForecast(dt: Int, lang : String): Flow<List<HourlyWeather>>
+    fun getAllHourlyWeatherForecast(): Flow<List<HourlyWeather>>
     fun getCurrentWeatherForecast(dt: Int, lang : String): Flow<HourlyWeather>
     suspend fun insertHourlyWeather(vararg list: HourlyWeather): List<Long>
     suspend fun clearHourlyWeather(): Int

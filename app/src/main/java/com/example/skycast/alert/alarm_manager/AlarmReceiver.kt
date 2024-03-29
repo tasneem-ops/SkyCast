@@ -5,8 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.skycast.R
+import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.model.dto.NotificationType
+import com.example.skycast.favorites.model.db.FavDB
+import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.network.RemoteDataSource
 import com.example.skycast.model.repository.WeatherRepository
@@ -26,7 +29,12 @@ class AlarmReceiver: BroadcastReceiver() {
             return
         }
         val testLatLng = LatLng(55.7504461, 37.6174943)
-        val repository = WeatherRepository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(context))
+        val repository = WeatherRepository.getInstance(RemoteDataSource.getInstance(),
+            LocalDataSource.getInstance(
+            WeatherDB.getInstance(context).getDailyWeatherDao(),
+            WeatherDB.getInstance(context).getHourlyWeatherDao(),
+            AlertsDB.getInstance(context).getAlertsDao(),
+            FavDB.getInstance(context).getFavDao()))
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 repository.getAlert(testLatLng, context.getString(R.string.apiKey))

@@ -14,7 +14,10 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
+import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.databinding.FragmentSearchBinding
+import com.example.skycast.favorites.model.db.FavDB
+import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.location.viewmodel.LocationViewModel
 import com.example.skycast.location.viewmodel.LocationViewModelFactory
 import com.example.skycast.model.Response
@@ -44,7 +47,11 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModelFactory = LocationViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(requireContext())), UserSettingsDataSource.getInstance(requireContext()))
+            LocalDataSource.getInstance(
+                WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
+                AlertsDB.getInstance(requireContext()).getAlertsDao(),
+                FavDB.getInstance(requireContext()).getFavDao())), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(this, viewModelFactory).get(LocationViewModel::class.java)
         initView()
         lifecycleScope.launch {

@@ -13,10 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
 import com.example.skycast.alert.alarm_manager.AlarmScheduler
+import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.viewmodel.AlertViewModel
 import com.example.skycast.alert.viewmodel.AlertViewModelFactory
 import com.example.skycast.databinding.FragmentAlertBinding
+import com.example.skycast.favorites.model.db.FavDB
+import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.model.Response
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
@@ -42,7 +45,11 @@ class AlertFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModelFactory = AlertViewModelFactory((WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(requireContext()))), UserSettingsDataSource.getInstance(requireContext()))
+            LocalDataSource.getInstance(
+                WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
+                AlertsDB.getInstance(requireContext()).getAlertsDao(),
+                FavDB.getInstance(requireContext()).getFavDao()))), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(AlertViewModel::class.java)
         initRecyclerView()
         binding.addAlertFab.setOnClickListener {

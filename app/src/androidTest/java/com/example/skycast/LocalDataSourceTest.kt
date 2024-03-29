@@ -1,102 +1,105 @@
 package com.example.skycast
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
+import androidx.test.filters.MediumTest
+import com.example.skycast.alert.model.db.AlertsDB
+import com.example.skycast.favorites.model.db.FavDB
 import com.example.skycast.home.model.db.WeatherDB
+import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
-import kotlinx.coroutines.flow.Flow
+import com.example.skycast.model.local.ILocalDataSource
+import com.example.skycast.model.local.LocalDataSource
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
-class HourlyWeatherDaoTest {
-    @get:Rule
-    val instantExcuterRule = InstantTaskExecutorRule()
-    lateinit var database: WeatherDB
+@MediumTest
+class LocalDataSourceTest {
+    lateinit var weatherDB: WeatherDB
+    lateinit var alertDB: AlertsDB
+    lateinit var favDB: FavDB
+    lateinit var localDataSource: ILocalDataSource
     @Before
     fun initDB(){
-        database = Room.inMemoryDatabaseBuilder(
+        weatherDB = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
-            WeatherDB::class.java).build()
+            WeatherDB::class.java)
+            .allowMainThreadQueries()
+            .build()
+        alertDB = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            AlertsDB::class.java)
+            .allowMainThreadQueries()
+            .build()
+        favDB = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            FavDB::class.java)
+            .allowMainThreadQueries()
+            .build()
+        localDataSource = LocalDataSource.getInstance(weatherDB.getDailyWeatherDao(), weatherDB.getHourlyWeatherDao(),
+            alertDB.getAlertsDao(), favDB.getFavDao())
     }
     @After
-    fun closeDB() = database.close()
+    fun closeDB(){
+        weatherDB.close()
+        alertDB.close()
+        favDB.getFavDao()
+    }
 
     @Test
-    fun insertAll_getAll_sameData( ) = runBlockingTest{
-        //Given
-        val dao = database.getHourlyWeatherDao()
+    fun insertDailyWeather_retreiveDailyWeather() = runTest{
+        localDataSource.insertDailyWeather(*dailyWeatherList.toTypedArray())
 
-        //When insert All Hourly List
-        dao.insertAll(*hourlyWeatherList.toTypedArray())
-        val result = dao.getAll()
+        val result = localDataSource.getAllDailyWeather()
 
-        // Assert That Data is saved in db
+        assertThat(result, `is`(notNullValue()))
+        assertThat(result.first(), `is`(dailyWeatherList))
+    }
+    @Test
+    fun insertDailyWeather_retreiveUpcomingDailyWeather() = runTest{
+        localDataSource.insertDailyWeather(*dailyWeatherList.toTypedArray())
+
+        val result = localDataSource.getDailyWeather(1648742400, "en")
+
+        assertThat(result, `is`(notNullValue()))
+        assertThat(result.first(), `is`(dailyWeatherList.takeLast(7)))
+    }
+
+    @Test
+    fun insertHourlyWeather_retreiveHourlyWeather() = runTest{
+        localDataSource.insertHourlyWeather(*hourlyWeatherList.toTypedArray())
+
+        val result = localDataSource.getAllHourlyWeatherForecast()
+
         assertThat(result, `is`(notNullValue()))
         assertThat(result.first(), `is`(hourlyWeatherList))
     }
-
     @Test
-    fun getHourlyWeatherForecast_get24HoursOrdered( ) = runBlockingTest{
-        //Given database with data in it
-        val dao = database.getHourlyWeatherDao()
-        dao.insertAll(*hourlyWeatherList.toTypedArray())
+    fun insertHourlyWeather_retreiveUpcomingHourlyWeather() = runTest{
+        localDataSource.insertHourlyWeather(*hourlyWeatherList.toTypedArray())
 
-        //When get All Hourly List
-        val result = dao.getHourlyWeatherForecast(1616983200, "en")
-        val result2 = dao.getHourlyWeatherForecast(1616994000, "en")
+        val result = localDataSource.getHourlyWeatherForecast(1617001200, "en")
 
-
-        // Assert That Data is as expected
         assertThat(result, `is`(notNullValue()))
-        assertThat(result.first().size, `is`(24))
-        assertThat(result.first(), `is`(hourlyWeatherList.take(24)))
-        assertThat(isSorted(result2.first()), `is`(true))
-
-        assertThat(result2, `is`(notNullValue()))
-        assertThat(result2.first().size, `is`(24))
-        assertThat(result2.first(), `is`(hourlyWeatherList.takeLast(27).take(24)))
-        assertThat(isSorted(result2.first()), `is`(true))
+        assertThat(result.first(), `is`(hourlyWeatherList.takeLast(25).take(24)))
     }
     @Test
-    fun getCurrentWeatherForecast_getCorrectData( ) = runBlockingTest{
-        //Given database with data in it
-        val dao = database.getHourlyWeatherDao()
-        dao.insertAll(*hourlyWeatherList.toTypedArray())
+    fun getCurrentWeatherForecast_retrieveNearestWeatherForecast() = runTest{
+        localDataSource.insertHourlyWeather(*hourlyWeatherList.toTypedArray())
 
-        //When get All Current Weather
-        val result = dao.getCurrentWeatherForecast(1617008400, "en")
+        val result = localDataSource.getCurrentWeatherForecast(1617001200, "en")
 
-        // Assert That Data is as expected
         assertThat(result, `is`(notNullValue()))
-        assertThat(result.first(), `is`(hourlyWeatherList.get(7)))
-    }
-
-    @Test
-    fun clear_getAllData_empty() = runBlockingTest{
-        //Given Dao with Data in it
-        val dao = database.getHourlyWeatherDao()
-        dao.insertAll(*hourlyWeatherList.toTypedArray())
-
-        //When Clear
-        dao.clear()
-        val result = dao.getAll()
-
-        // Assert That Data is saved in db
-        assertThat(result, `is`(notNullValue()))
-        assertThat(result.first(), `is`(emptyList()))
+        assertThat(result.first(), `is`(hourlyWeatherList.get(5)))
     }
 
     val hourlyWeatherList = arrayListOf(
@@ -132,13 +135,14 @@ class HourlyWeatherDaoTest {
         HourlyWeather(1617084000, 20.8, 19.1, 997, 43, 2.2, 20, 10000, 0.3, 801, "Cloudy", "en"),
         HourlyWeather(1617087600, 21.0, 19.3, 997, 42, 2.4, 20, 10000, 0.2, 801, "Cloudy", "en")
     )
-}
-
-private fun isSorted(list : List<HourlyWeather>) : Boolean{
-    for (i in 0 until list.size - 1) {
-        if (list[i].dt > list[i + 1].dt) {
-            return false
-        }
-    }
-    return true
+    val dailyWeatherList = listOf(
+        DailyWeather(1648656000, 0.25, "Partly cloudy", 10.0, 20.0, 1015, 70, 5.0, 801, "Clouds", 40, 5.6, "en"),
+        DailyWeather(1648742400, 0.75, "Sunny", 15.0, 25.0, 1010, 60, 8.0, 800, "Clear", 10, 7.8, "en"),
+        DailyWeather(1648828800, 0.5, "Rainy", 8.0, 18.0, 1020, 80, 6.0, 500, "Rain", 90, 3.2, "en"),
+        DailyWeather(1648915200, 0.9, "Thunderstorms", 12.0, 22.0, 1005, 85, 7.5, 211, "Thunderstorm", 80, 2.5, "en"),
+        DailyWeather(1649001600, 0.3, "Cloudy", 9.0, 17.0, 1022, 75, 4.5, 803, "Broken clouds", 70, 4.8, "en"),
+        DailyWeather(1649088000, 0.7, "Foggy", 7.0, 16.0, 1012, 90, 3.0, 741, "Fog", 20, 1.5, "en"),
+        DailyWeather(1649174400, 0.1, "Snowy", -2.0, 5.0, 1030, 95, 2.0, 601, "Snow", 100, 1.0, "en"),
+        DailyWeather(1649260800, 0.8, "Windy", 11.0, 21.0, 1008, 65, 10.0, 952, "Wind", 50, 6.3, "en")
+    )
 }

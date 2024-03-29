@@ -13,9 +13,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.skycast.R
 import com.example.skycast.alert.alarm_manager.AlarmScheduler
+import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.alert.viewmodel.AlertViewModel
 import com.example.skycast.alert.viewmodel.AlertViewModelFactory
 import com.example.skycast.databinding.FragmentAddAlertBinding
+import com.example.skycast.favorites.model.db.FavDB
+import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.model.local.LocalDataSource
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
@@ -40,7 +43,11 @@ class AddAlertFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModelFactory = AlertViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(requireContext())), UserSettingsDataSource.getInstance(requireContext()))
+            LocalDataSource.getInstance(
+                WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
+                AlertsDB.getInstance(requireContext()).getAlertsDao(),
+                FavDB.getInstance(requireContext()).getFavDao())), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(AlertViewModel::class.java)
         val latitude = arguments?.getFloat("lat")?.toDouble()
         val longitude = arguments?.getFloat("lng")?.toDouble()

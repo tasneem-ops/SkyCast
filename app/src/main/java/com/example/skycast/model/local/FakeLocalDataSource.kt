@@ -37,6 +37,12 @@ class FakeLocalDataSource : ILocalDataSource {
         }
     }
 
+    override fun getAllDailyWeather(): Flow<List<DailyWeather>> {
+        return flow {
+            emit(localDailyWeatherList)
+        }
+    }
+
     override suspend fun clearDailyWeather(): Int {
         val size = localDailyWeatherList.size
         localDailyWeatherList.clear()
@@ -51,6 +57,12 @@ class FakeLocalDataSource : ILocalDataSource {
     override fun getHourlyWeatherForecast(dt: Int, lang: String): Flow<List<HourlyWeather>> {
         return flow {
             emit(localHourlyWeatherList)
+        }
+    }
+
+    override fun getAllHourlyWeatherForecast(): Flow<List<HourlyWeather>> {
+        return flow {
+            localHourlyWeatherList
         }
     }
 

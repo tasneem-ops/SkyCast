@@ -12,19 +12,28 @@ import com.example.skycast.home.model.db.HourlyWeatherDao
 import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-class LocalDataSource private constructor(val context: Context) : ILocalDataSource {
-    private var dailyWeatherDao: DailyWeatherDao = WeatherDB.getInstance(context).getDailyWeatherDao()
-    private var hourlyWeatherDao: HourlyWeatherDao = WeatherDB.getInstance(context).getHourlyWeatherDao()
-    private var alertDao : AlertsDao = AlertsDB.getInstance(context).getAlertsDao()
-    private val favDao : FavDao = FavDB.getInstance(context).getFavDao()
+class LocalDataSource private constructor(private val dailyWeatherDao : DailyWeatherDao,
+                                          private val hourlyWeatherDao : HourlyWeatherDao,
+                                          private var alertDao : AlertsDao,
+                                          private val favDao : FavDao,
+                                          private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+
+    ) : ILocalDataSource {
     companion object{
         @Volatile
         private var INSTANCE: LocalDataSource? = null
-        fun getInstance (context: Context): LocalDataSource{
+        fun getInstance (dailyWeatherDao : DailyWeatherDao,
+                         hourlyWeatherDao : HourlyWeatherDao,
+                         alertDao : AlertsDao,
+                         favDao : FavDao,
+                         ioDispatcher: CoroutineDispatcher = Dispatchers.IO): LocalDataSource{
             return INSTANCE ?: synchronized(this){
-                val instance = LocalDataSource(context)
+                val instance = LocalDataSource(dailyWeatherDao, hourlyWeatherDao, alertDao, favDao, ioDispatcher)
                 INSTANCE = instance
                 instance
             }
@@ -34,46 +43,56 @@ class LocalDataSource private constructor(val context: Context) : ILocalDataSour
     override fun getDailyWeather(dt: Int, lang : String) : Flow<List<DailyWeather>> {
         return dailyWeatherDao.getDailyWeatherForecast(dt, lang)
     }
-    override suspend fun clearDailyWeather() : Int{
-        return dailyWeatherDao.clear()
+
+    override fun getAllDailyWeather(): Flow<List<DailyWeather>> {
+        return dailyWeatherDao.getAllDaily()
     }
-    override suspend fun insertDailyWeather(vararg dailyWeather: DailyWeather) : List<Long>{
-        return dailyWeatherDao.insertAll(*dailyWeather)
+
+    override suspend fun clearDailyWeather() : Int = withContext(ioDispatcher){
+        return@withContext dailyWeatherDao.clear()
+    }
+    override suspend fun insertDailyWeather(vararg dailyWeather: DailyWeather) : List<Long> = withContext(ioDispatcher){
+        return@withContext dailyWeatherDao.insertAll(*dailyWeather)
     }
     override fun getHourlyWeatherForecast(dt : Int, lang : String) : Flow<List<HourlyWeather>>{
         return hourlyWeatherDao.getHourlyWeatherForecast(dt, lang)
     }
+
+    override fun getAllHourlyWeatherForecast(): Flow<List<HourlyWeather>> {
+        return hourlyWeatherDao.getAll()
+    }
+
     override fun getCurrentWeatherForecast(dt : Int, lang : String) : Flow<HourlyWeather>{
         return hourlyWeatherDao.getCurrentWeatherForecast(dt, lang)
     }
-    override suspend fun insertHourlyWeather(vararg list : HourlyWeather) : List<Long>{
-        return hourlyWeatherDao.insertAll(*list)
+    override suspend fun insertHourlyWeather(vararg list : HourlyWeather) : List<Long> = withContext(ioDispatcher){
+        return@withContext hourlyWeatherDao.insertAll(*list)
     }
-    override suspend fun clearHourlyWeather() : Int{
-        return hourlyWeatherDao.clear()
+    override suspend fun clearHourlyWeather() : Int = withContext(ioDispatcher){
+        return@withContext hourlyWeatherDao.clear()
     }
 
     override fun getAlerts(): Flow<List<AlertDTO>> {
         return alertDao.getAllAlerts()
     }
 
-    override suspend fun addAlert(alert: AlertDTO): Long {
-        return alertDao.addAlert(alert)
+    override suspend fun addAlert(alert: AlertDTO): Long = withContext(ioDispatcher){
+        return@withContext alertDao.addAlert(alert)
     }
 
-    override suspend fun delete(alert: AlertDTO): Int {
-        return alertDao.deleteAlert(alert)
+    override suspend fun delete(alert: AlertDTO): Int = withContext(ioDispatcher){
+        return@withContext alertDao.deleteAlert(alert)
     }
 
-    override suspend fun addFav(favDTO: FavDTO): Long {
-        return favDao.addFav(favDTO)
+    override suspend fun addFav(favDTO: FavDTO): Long = withContext(ioDispatcher){
+        return@withContext favDao.addFav(favDTO)
     }
 
     override fun getAllFav(): Flow<List<FavDTO>> {
         return favDao.getAllFav()
     }
 
-    override suspend fun deleteFav(favDTO: FavDTO): Int {
-        return favDao.deleteFav(favDTO)
+    override suspend fun deleteFav(favDTO: FavDTO): Int = withContext(ioDispatcher){
+        return@withContext favDao.deleteFav(favDTO)
     }
 }

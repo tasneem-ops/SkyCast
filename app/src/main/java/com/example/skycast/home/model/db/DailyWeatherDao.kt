@@ -13,6 +13,9 @@ interface DailyWeatherDao {
     @Query("SELECT * FROM daily_weather WHERE dt >= :currentDt AND lang = :lang ORDER BY dt ASC LIMIT 7")
     fun getDailyWeatherForecast(currentDt : Int, lang : String) : Flow<List<DailyWeather>>
 
+    @Query("SELECT * FROM daily_weather")
+    fun getAllDaily() : Flow<List<DailyWeather>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg list :DailyWeather) : List<Long>
 

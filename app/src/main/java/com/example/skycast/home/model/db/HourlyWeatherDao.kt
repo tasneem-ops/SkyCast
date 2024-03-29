@@ -14,7 +14,8 @@ interface HourlyWeatherDao {
 
     @Query("SELECT * FROM hourly_weather WHERE dt >= :currentDt AND lang= :lang ORDER BY dt ASC LIMIT 1")
     fun getCurrentWeatherForecast(currentDt : Int, lang: String) : Flow<HourlyWeather>
-
+    @Query("SELECT * FROM hourly_weather")
+    fun getAll() : Flow<List<HourlyWeather>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg list : HourlyWeather) : List<Long>
 

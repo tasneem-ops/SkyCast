@@ -25,7 +25,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.skycast.R
+import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.databinding.FragmentHomeBinding
+import com.example.skycast.favorites.model.db.FavDB
+import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.home.model.dto.WeatherResult
 import com.example.skycast.home.viewmodel.WeatherViewModel
 import com.example.skycast.home.viewmodel.WeatherViewModelFactory
@@ -68,7 +71,11 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weatherViewModelFactory = WeatherViewModelFactory(WeatherRepository(RemoteDataSource.getInstance(), LocalDataSource.getInstance(requireContext())),
+        val weatherViewModelFactory = WeatherViewModelFactory(WeatherRepository(RemoteDataSource.getInstance(),
+            LocalDataSource.getInstance(WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
+                AlertsDB.getInstance(requireContext()).getAlertsDao(),
+                FavDB.getInstance(requireContext()).getFavDao())),
             UserSettingsDataSource.getInstance(requireContext()))
         weatherViewModel = ViewModelProvider(this, weatherViewModelFactory).get(WeatherViewModel::class.java)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
