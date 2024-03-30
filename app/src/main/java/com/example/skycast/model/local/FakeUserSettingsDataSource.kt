@@ -42,6 +42,15 @@ class FakeUserSettingsDataSource : IUserSettingsDataSource {
     override fun setSavedLocation(latLng: LatLng) {
         savedLocation = latLng
     }
+
+    override fun isNotificationEnabled(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun setNotificationEnabled(enable: Boolean) {
+        TODO("Not yet implemented")
+    }
+
     companion object{
         private const val USER_SETTINGS = "USER_SETTINGS"
         private const val LOCATION_SOURCE = "LOCATION_SOURCE"

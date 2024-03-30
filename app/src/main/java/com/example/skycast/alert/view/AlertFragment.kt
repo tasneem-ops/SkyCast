@@ -78,8 +78,8 @@ class AlertFragment : Fragment() {
         alertsListAdapter = AlertsListAdapter{ alert ->
             Snackbar.make(binding.alertsRecyclerView, "Delete Alert?", Snackbar.LENGTH_SHORT)
                 .setAction("Delete"){
-                    viewModel.deleteAlert(alert)
                     AlarmScheduler(requireContext()).cancel(alert)
+                    viewModel.deleteAlert(alert)
                 }
                 .show()
 
@@ -110,6 +110,7 @@ class AlertFragment : Fragment() {
             binding.error.visibility = View.GONE
             binding.empty.visibility = View.GONE
             alertsListAdapter.submitList(data)
+            alertsListAdapter.notifyDataSetChanged()
         }
         else{
             binding.loading.visibility = View.GONE

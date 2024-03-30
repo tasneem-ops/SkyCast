@@ -65,6 +65,18 @@ class UserSettingsDataSource private constructor(val context: Context) : IUserSe
             .apply()
     }
 
+    override fun isNotificationEnabled(): Boolean {
+        return context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
+            .getBoolean(NOTIFICATION, true)
+    }
+
+    override fun setNotificationEnabled(enable: Boolean) {
+        context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(NOTIFICATION, enable)
+            .apply()
+    }
+
     companion object{
         @Volatile
         private var INSTANCE: UserSettingsDataSource? = null
@@ -96,5 +108,7 @@ class UserSettingsDataSource private constructor(val context: Context) : IUserSe
         private const val LANGUAGE = "LANGUAGE"
         const val ARABIC = "ar"
         const val ENGLISH = "en"
+
+        private const val NOTIFICATION = "NOTIFICATION"
     }
 }

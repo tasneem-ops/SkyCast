@@ -28,7 +28,8 @@
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:fontFamily="@font/roboto_medium"/>
 
             <ImageView
                 android:id="@+id/imageView"
@@ -38,8 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/temp_max_text"
                 app:layout_constraintTop_toTopOf="parent"
-                weatherIcon="@{forecast.weatherId}"
-                android:visibility="gone"/>
+                weatherIcon="@{forecast.weatherId}" />
 
             <TextView
                 android:id="@+id/temp_max_text"
@@ -48,9 +48,9 @@
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/temp_min_text"
-                android:text="@{String.valueOf(forecast.maxTemp) + `°`}"
+                temp="@{forecast.maxTemp}"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"/>
+                android:fontFamily="@font/roboto_medium"/>
 
             <TextView
                 android:id="@+id/temp_min_text"
@@ -58,11 +58,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:textSize="18sp"
-                android:text="@{`/` + String.valueOf(forecast.minTemp)+ `°`}"
+                temp="@{forecast.minTemp}"
+                addSlash="@{true}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"/>
+                android:fontFamily="@font/roboto_medium"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

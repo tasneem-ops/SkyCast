@@ -1,5 +1,7 @@
 package com.example.skycast.alert.view
 
+import android.content.Context
+import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -21,7 +23,23 @@ class AlertsListAdapter (val onClick : (AlertDTO) -> Unit) : ListAdapter<AlertDT
     }
     override fun onBindViewHolder(holder: AlertViewHolder, position: Int) {
         holder.binding.alert = getItem(position)
-        holder.binding.deleteBtn.setOnClickListener { onClick(getItem(position)) }
+        holder.binding.deleteBtn.setOnClickListener { onClick(getItem(holder.adapterPosition)) }
+        holder.binding.cityName.text = latLngToCityName(getItem(position).latitude, getItem(position).longitude, holder.binding.cityName.context)
+    }
+    fun latLngToCityName( latitude : Double, longitude: Double, context: Context) : String?{
+        try {
+            val address = Geocoder(context).getFromLocation(latitude, longitude, 1)
+            if(address == null)
+                return null
+            if (address.isEmpty())
+                return null
+            if(address.get(0).locality == null){
+                return address.get(0).adminArea + ", " + address.get(0)?.countryName
+            }
+            return address.get(0)?.locality + ", " + address.get(0)?.countryName
+        } catch (e : Exception){
+            return "UnKnown City"
+        }
     }
 }
 class AlertViewHolder(val binding : AlertItemBinding): RecyclerView.ViewHolder(binding.root)

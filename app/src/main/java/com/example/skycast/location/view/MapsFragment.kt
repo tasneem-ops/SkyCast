@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.navigation.Navigation
 import com.example.skycast.R
 
@@ -22,16 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class MapsFragment : Fragment() {
     lateinit var map : GoogleMap
     var chosenLatLng = LatLng(30.033333, 31.233334)
+    lateinit var cityNameText : TextView
     private val callback = OnMapReadyCallback { googleMap ->
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         map = googleMap
         val cairo = LatLng(30.033333, 31.233334)
         googleMap.addMarker(MarkerOptions().position(cairo).title("Marker in Cairo"))
@@ -40,6 +34,16 @@ class MapsFragment : Fragment() {
             map.clear()
             map.addMarker(MarkerOptions().position(it))
             chosenLatLng = it
+            cityNameText.text = latLngToCityName(it.latitude, it.longitude)
+        }
+        val latitude = arguments?.getFloat("lat")?.toDouble()
+        val longitude = arguments?.getFloat("lon")?.toDouble()
+        if(latitude != null && latitude != 0.0 && longitude != null && longitude != 0.0){
+            chosenLatLng = LatLng(latitude, longitude)
+            cityNameText.text = latLngToCityName(chosenLatLng.latitude, chosenLatLng.longitude)
+            map.clear()
+            map.addMarker(MarkerOptions().position(chosenLatLng))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenLatLng, 6f))
         }
     }
 
@@ -55,14 +59,10 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-        val button = view.findViewById<FloatingActionButton>(R.id.map_save)
-//        button.setOnClickListener {
-//            val action = MapsFragmentDirections.actionMapsFragmentToSearchFragment()
-//            Navigation.findNavController(it).navigate(action)
-//        }
-
-
-        button.setOnClickListener {
+        cityNameText = view.findViewById(R.id.cityName)
+        val saveButton = view.findViewById<FloatingActionButton>(R.id.map_save)
+        val searchBar = view.findViewById<CardView>(R.id.search_bar)
+        saveButton.setOnClickListener {
             when (arguments?.getInt("type")) {
                 HOME_TYPE -> {
                     val action = MapsFragmentDirections.actionMapsFragmentToHomeFragment(
@@ -97,6 +97,11 @@ class MapsFragment : Fragment() {
 
             }
         }
+        searchBar.setOnClickListener{
+            val action = MapsFragmentDirections.actionMapsFragmentToSearchFragment(arguments?.getInt("type") ?:0)
+            Navigation.findNavController(it).navigate(action)
+        }
+
     }
     fun latLngToCityName( latitude : Double, longitude: Double) : String?{
         try {
@@ -112,6 +117,16 @@ class MapsFragment : Fragment() {
         } catch (e : Exception){
             return "UnKnown City"
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity  as AppCompatActivity).supportActionBar?.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity  as AppCompatActivity).supportActionBar?.show()
     }
     companion object{
         const val SEARCH_TYPE = 4

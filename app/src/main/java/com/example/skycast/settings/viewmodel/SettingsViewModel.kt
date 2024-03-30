@@ -40,5 +40,11 @@ class SettingsViewModel(private val settingsDataSource: UserSettingsDataSource) 
     fun setSavedLocation(latLng: LatLng){
         settingsDataSource.setSavedLocation(latLng)
     }
+    fun isNotificationEnabled(): Boolean{
+        return settingsDataSource.isNotificationEnabled()
+    }
+    fun setNotificationEnabled(enable : Boolean){
+        settingsDataSource.setNotificationEnabled(enable)
+    }
 
 }

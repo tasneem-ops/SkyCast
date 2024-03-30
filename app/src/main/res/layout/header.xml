@@ -17,7 +17,7 @@
         tools:layout_editor_absoluteY="54dp" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/clouds_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

@@ -2,6 +2,9 @@ package com.example.skycast.home.view
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
@@ -38,14 +41,18 @@ import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.network.RemoteDataSource
 import com.example.skycast.model.repository.WeatherRepository
 import com.example.skycast.work.DailyCacheWorker
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -84,6 +91,7 @@ class HomeFragment : Fragment() {
             arguments?.getFloat("lat") == 0.0f || arguments?.getFloat("lng") == 0.0f){
             Log.i(TAG, "onViewCreated: ")
             if(weatherViewModel.isLocationSaved()){
+                Log.i(TAG, "onViewCreated: Location Saved")
                 weatherViewModel.getWeatherForecastForSavedLocation(getString(R.string.apiKey))
             }
             else{
@@ -119,8 +127,6 @@ class HomeFragment : Fragment() {
     private fun requestDailyCache() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(true)
-            .setRequiresDeviceIdle(true)
             .build()
         val myWorkRequest: PeriodicWorkRequest = PeriodicWorkRequestBuilder<DailyCacheWorker>(
             1, TimeUnit.DAYS, 1, TimeUnit.HOURS)
@@ -197,7 +203,8 @@ class HomeFragment : Fragment() {
     private fun getDataFromGPS(){
         Log.i(TAG, "getDataFromGPS: ")
         if(checkPermissions()){
-            getLocation()
+            checkDeviceLocationSettings()
+//            getLocation()
         }
         else{
             requestPermissions(
@@ -224,6 +231,7 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = RecyclerView.VERTICAL
             }
+            isNestedScrollingEnabled = true
         }
     }
     fun checkPermissions(): Boolean{
@@ -249,7 +257,7 @@ class HomeFragment : Fragment() {
         if (requestCode == My_LOCATION_PERMISSION_ID ) {
             if ( grantResults[0]==PackageManager.PERMISSION_GRANTED || grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 Log.i(TAG, "onRequestPermissionsResult: Accepted")
-                getLocation()
+                checkDeviceLocationSettings()
             }
             else{
                 Log.i(TAG, "onRequestPermissionsResult: Rejected")
@@ -296,6 +304,7 @@ class HomeFragment : Fragment() {
                 val address = geocoder?.getFromLocation(it.latitude, it.longitude, 1)
                 binding.cityText.text = address?.get(0)?.locality
             }
+            binding.weatherDescText.text = it.weatherDescription.capitalizeWords()
 
         }
         hourListAdapter.submitList(data.hourly)
@@ -314,10 +323,57 @@ class HomeFragment : Fragment() {
                 getForecastData(latLng!!, connectionStatus, true)
             }
     }
+    @SuppressLint("MissingPermission")
+    private fun checkDeviceLocationSettings(resolve:Boolean = true) {
+        val locationRequest = LocationRequest()
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(builder.build())
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve){
+                try {
+                    startIntentSenderForResult(exception.resolution.intentSender,
+                        REQUEST_TURN_DEVICE_LOCATION_ON, null, 0,0,0,null)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Snackbar.make(
+                    binding.dayRecyclerView,
+                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettings()
+                }.show()
+            }
+        }
+        locationSettingsResponseTask.addOnCompleteListener {
+            if ( it.isSuccessful ) {
+                getLocation()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON){
+            if (resultCode == Activity.RESULT_OK){
+                getLocation()
+            }
+        }
+    }
+    fun String.capitalizeWords(delimiter: String = " "): String {
+        return split(delimiter).joinToString(delimiter) { word ->
+            val smallCaseWord = word.lowercase()
+            smallCaseWord.replaceFirstChar(Char::titlecaseChar)
+        }
+    }
     companion object{
         private const val My_LOCATION_PERMISSION_ID = 5005
         const val SOURCE_MAP = "MAP"
         const val SOURCE_GPS = "GPS"
         const val HOME_TYPE = 1
+        private const val REQUEST_TURN_DEVICE_LOCATION_ON: Int = 12345
+
     }
 }

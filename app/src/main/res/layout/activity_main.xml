@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity"
         android:id="@+id/drawer_layout"
-        android:background="@color/backgroundTint">
+        android:background="@color/background">
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"
@@ -21,7 +21,7 @@
             android:layout_gravity="start"
             app:menu="@menu/menu"
             app:headerLayout="@layout/header"
-            android:background="@color/backgroundTint"/>
+            android:background="@color/background"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

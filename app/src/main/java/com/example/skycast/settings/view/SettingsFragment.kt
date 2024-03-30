@@ -15,6 +15,8 @@ import androidx.navigation.Navigation
 import com.example.skycast.MainActivity
 import com.example.skycast.R
 import com.example.skycast.databinding.FragmentSettingsBinding
+import com.example.skycast.home.view.HomeFragment
+import com.example.skycast.home.view.HomeFragmentDirections
 import com.example.skycast.model.local.UserSettingsDataSource
 import com.example.skycast.model.local.UserSettingsDataSource.Companion.ARABIC
 import com.example.skycast.model.local.UserSettingsDataSource.Companion.ENGLISH
@@ -44,6 +46,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModelFactory = SettingsViewModelFactory(UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingsViewModel::class.java)
+        initUI()
         binding.languageGroup.setOnCheckedChangeListener { radioGroup, i ->
             when(i){
                 R.id.arabicRadio -> {
@@ -67,6 +70,8 @@ class SettingsFragment : Fragment() {
             when(i){
                 R.id.mapRadio -> {
                     viewModel.setLocationSource(SOURCE_MAP)
+                    val action = SettingsFragmentDirections.actionSettingsFragmentToMapsFragment(HomeFragment.HOME_TYPE)
+                    Navigation.findNavController(binding.locationGroup).navigate(action)
                 }
                 R.id.gpsRadio -> {
                     viewModel.setLocationSource(SOURCE_GPS)
@@ -86,5 +91,36 @@ class SettingsFragment : Fragment() {
                 R.id.kelvinRadio ->{viewModel.setTempUnit(UNIT_KELVIN)}
             }
         }
+        binding.switch1.setOnCheckedChangeListener{ _, isChecked->
+            viewModel.setNotificationEnabled(isChecked)
+        }
+    }
+
+    private fun initUI() {
+        val language = viewModel.getPreferredLanguage()
+        if(language == ARABIC)
+            binding.languageGroup.check(R.id.arabicRadio)
+        else
+            binding.languageGroup.check(R.id.englishRadio)
+
+        val speedUnit = viewModel.getSpeedUnit()
+        if(speedUnit == UNIT_MPH)
+            binding.speedGroup.check(R.id.mphRadio)
+        else
+            binding.speedGroup.check(R.id.mpsRadio)
+
+        val locationSource = viewModel.getLocationSource()
+        if(locationSource == SOURCE_MAP)
+            binding.locationGroup.check(R.id.mapRadio)
+        else
+            binding.locationGroup.check(R.id.gpsRadio)
+
+        val tempUnit = viewModel.getTempUnit()
+        if(tempUnit == UNIT_KELVIN)
+            binding.tempGroup.check(R.id.kelvinRadio)
+        else if(tempUnit == UNIT_FAHRENHEIT)
+            binding.tempGroup.check(R.id.fahRadio)
+        else
+            binding.tempGroup.check(R.id.celsiusRadio)
     }
 }

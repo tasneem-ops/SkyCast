@@ -19,6 +19,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/favorites"
             android:textSize="18sp"
+            android:fontFamily="@font/roboto_bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +45,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:contentDescription="@string/add_to_favorites"
-            android:backgroundTint="@color/backgroundTint"
+            android:backgroundTint="@color/colorSecondary"
             android:focusable="true" />
         <ImageView
             android:id="@+id/no_fav"

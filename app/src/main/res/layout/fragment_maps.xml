@@ -14,6 +14,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="24dp">
+
+            <TextView
+                android:id="@+id/cityName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/cairo_egypt"
+                tools:text="Cairo, Egypt" />
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/search" />
+        </androidx.cardview.widget.CardView>
+
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -28,8 +51,8 @@
             android:layout_gravity="bottom|right"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
+            android:src="@drawable/check"
             android:backgroundTint="@color/colorSecondary"
-            app:icon="@drawable/check"
             tools:ignore="RtlHardcoded" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

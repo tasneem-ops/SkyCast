@@ -19,8 +19,13 @@ class DailyListAdapter () : ListAdapter<DailyWeather, DailyViewHolder>(DailyDiff
     }
     override fun onBindViewHolder(holder: DailyViewHolder, position: Int) {
         holder.binding.forecast = getItem(position)
-        holder.binding.textView.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(getItem(position).dt*1000L)
-
+        holder.binding.textView.text = SimpleDateFormat("EE dd/MM/yy", Locale.US).format(getItem(position).dt*1000L)
+        if(position.equals(0)){
+            holder.binding.textView.text = (holder.binding.textView.context).getString(R.string.today)
+        }
+        if(position.equals(1)){
+            holder.binding.textView.text = (holder.binding.textView.context).getString(R.string.tomorrow)
+        }
     }
 }
 class DailyViewHolder(val binding : DayForecastItemBinding): RecyclerView.ViewHolder(binding.root)

@@ -1,12 +1,17 @@
 package com.example.skycast.location.view
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -55,9 +60,10 @@ class SearchFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory).get(LocationViewModel::class.java)
         initView()
         lifecycleScope.launch {
-            sharedFlow.sample(500)
+            sharedFlow.sample(1000)
                 .collect{
                     viewModel.getSuggestions(it)
+                    Log.i("TAG", "onViewCreated: Collect $it")
                 }
         }
         lifecycleScope.launch{
@@ -67,6 +73,7 @@ class SearchFragment : Fragment() {
                         Toast.makeText(requireContext(), "Failure", Toast.LENGTH_SHORT).show()
                     }
                     is Response.Success ->{
+                        Log.i("TAG", "onViewCreated: Success ${response.data}")
                         searchAdapter.submitList(response.data)
                     }
                     else ->{
@@ -75,26 +82,26 @@ class SearchFragment : Fragment() {
                 }
             }
         }
-        binding.searchView.setOnQueryTextListener(object : OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
+        binding.searchText.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                Log.i("TAG", "onTextChanged: $text")
                 lifecycleScope.launch {
-                    query?.let { sharedFlow.emit(it) }
+                    sharedFlow.emit(text.toString())
                 }
-                return true
             }
 
-            override fun onQueryTextChange(query: String?): Boolean {
-                lifecycleScope.launch {
-                    query?.let { sharedFlow.emit(it) }
-                }
-                return true
-            }
+            override fun afterTextChanged(p0: Editable?) {}
+
         })
+
     }
 
     private fun initView() {
         searchAdapter = SearchListAdapter{
-            val action = SearchFragmentDirections.actionSearchFragmentToMapsFragment()
+            val action = SearchFragmentDirections
+                .actionSearchFragmentToMapsFragment(arguments?.getInt("type") ?:0,it.lat?.toFloat() ?:0.0f, it.lon?.toFloat()?:0.0f)
             Navigation.findNavController(binding.searchRecyclerView).navigate(action)
         }
         binding.searchRecyclerView.apply {
@@ -104,5 +111,13 @@ class SearchFragment : Fragment() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        (activity  as AppCompatActivity).supportActionBar?.hide()
+    }
 
+    override fun onStop() {
+        super.onStop()
+        (activity  as AppCompatActivity).supportActionBar?.show()
+    }
 }

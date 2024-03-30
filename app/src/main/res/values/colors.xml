@@ -2,9 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#D5BDAF</color>
-    <color name="colorSecondary">#E3D5CA</color>
-    <color name="cardColor">#F5EBE0</color>
-    <color name="backgroundTint">#EDEDE9</color>
-    <color name="green">#9acd32</color>
+    <color name="colorPrimary">#176B87</color>
+    <color name="colorPrimaryVariant">#005771</color>
+    <color name="colorSecondary">#7183c1</color>
+    <color name="colorSecondaryVariant">#7183c1</color>
+    <color name="background">#ECF3F7</color>
+    <color name="backgroundTint">#ECF3F7</color>
+    <color name="accent">#8bbed7</color>
+    <color name="green">#1C672E</color>
 </resources>

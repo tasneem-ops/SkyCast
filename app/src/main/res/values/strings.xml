@@ -7,10 +7,11 @@
     <string name="home">Home</string>
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
-    <string name="celcuis_unit">°C</string>
+    <string name="celcuis_unit">C</string>
     <string name="clear_sky">Clear Sky</string>
     <string name="search_for_place">Search For Places..</string>
-    <string name="fahrenheit_unit">°F</string>
+    <string name="fahrenheit_unit">F</string>
+    <string name="kelvin_unit">K</string>
     <string name="hourly_forecast">Hourly Forecast</string>
     <string name="current_conditions">Current Conditions</string>
     <string name="pressure">Pressure</string>
@@ -46,4 +47,17 @@
     <string name="no_favorites_saved">No Favorites Saved</string>
     <string name="choose_location_source">Choose Location Source</string>
     <string name="please_choose_location_source">You Need to Choose Location Source</string>
+    <string name="enabled">Enabled</string>
+    <string name="notifications">Notifications</string>
+    <string name="cairo_egypt">Cairo, Egypt</string>
+    <string name="notification">Notification</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification_type">Notification Type</string>
+    <string name="not_yet_selected">Not Yet Selected</string>
+    <string name="ok">Ok</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="no_alerts">No Alerts</string>
+    <string name="location_required_error">App Needs Location Enabled to Function Correctly</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
 </resources>

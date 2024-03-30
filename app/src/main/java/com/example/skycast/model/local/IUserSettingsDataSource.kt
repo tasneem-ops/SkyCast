@@ -13,4 +13,7 @@ interface IUserSettingsDataSource {
     fun setSpeedUnit(unit: String)
     fun getSavedLocation(): LatLng
     fun setSavedLocation(latLng: LatLng)
+
+    fun isNotificationEnabled(): Boolean
+    fun setNotificationEnabled(enable : Boolean)
 }

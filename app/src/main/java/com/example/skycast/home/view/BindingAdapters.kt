@@ -56,6 +56,24 @@ fun setTwoLineDateTimeText(view: TextView, dateTime : Long){
 fun setDateTimeText(view: TextView, dateTime : Int){
     view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(dateTime*1000L)
 }
+
+@BindingAdapter("temp", "addSlash")
+fun setTempInt(view: TextView, temp : Double, addSlash : Boolean = false){
+    if(addSlash){
+        view.text = "\\" + Math.round(temp).toString() + "°"
+    }
+    else{
+        view.text = Math.round(temp).toString() + "°"
+    }
+}
+@BindingAdapter("temp")
+fun setTempInt(view: TextView, temp : Double){
+    view.text = Math.round(temp).toString() + "°"
+}
+@BindingAdapter("temp", "unit")
+fun setTempInt(view: TextView, temp : Double, unit : String){
+    view.text = Math.round(temp).toString() + "°" + unit
+}
 //@BindingAdapter("latitude", "longitude")
 //fun latLngToCityName(view: TextView, latitude : Double, longitude: Double){
 //    val address = Geocoder(view.context).getFromLocation(latitude, longitude, 1)
