@@ -37,7 +37,7 @@ class AlarmReceiver: BroadcastReceiver() {
             FavDB.getInstance(context).getFavDao()))
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                repository.getAlert(testLatLng, context.getString(R.string.apiKey))
+                repository.getAlert(LatLng(item.latitude, item.longitude), context.getString(R.string.apiKey))
                     .first {
                         if (item.notificationEnabled){
                             when(item.notificationType){
@@ -47,16 +47,30 @@ class AlarmReceiver: BroadcastReceiver() {
                                 }
                                 NotificationType.ALARM ->{
                                     Log.i(TAG, "Alarm: ")
+                                    val intent = Intent(context, AlarmService::class.java)
+                                    intent.putExtra("MESSAGE", it.event)
+                                    context.startService(intent)
                                 }
                             }
                         }
                         true
                     }
             } catch (e: NoSuchElementException){
-                sendDataNotification(context, "No Alerts" +
-                        "")
+                if (item.notificationEnabled){
+                    when(item.notificationType){
+                        NotificationType.NOTIFICATION -> {
+                            Log.i(TAG, "Notification: ")
+                            sendDataNotification(context, context.getString(R.string.no_alerts))
+                        }
+                        NotificationType.ALARM ->{
+                            Log.i(TAG, "Alarm: ")
+                            val intent = Intent(context, AlarmService::class.java)
+                            intent.putExtra("MESSAGE", context.getString(R.string.no_alerts))
+                            context.startService(intent)
+                        }
+                    }
+                }
             }
-
         }
     }
 }
