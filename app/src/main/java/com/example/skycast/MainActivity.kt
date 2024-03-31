@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setAppLocale()
         setSupportActionBar(binding.materialToolbar)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         binding.navigationView.bringToFront()
@@ -84,7 +83,8 @@ class MainActivity : AppCompatActivity() {
         // network is available for use
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            Snackbar.make(binding.navigationView, "Back Online", Snackbar.LENGTH_SHORT)
+            Snackbar.make(binding.navigationView,
+                getString(R.string.back_online), Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(resources.getColor(R.color.green))
                 .show()
         }
@@ -101,7 +101,8 @@ class MainActivity : AppCompatActivity() {
         // lost network connection
         override fun onLost(network: Network) {
             super.onLost(network)
-            Snackbar.make(binding.navigationView, "You are Currently Offline", Snackbar.LENGTH_SHORT)
+            Snackbar.make(binding.navigationView,
+                getString(R.string.you_are_currently_offline), Snackbar.LENGTH_SHORT)
                 .show()
         }
     }
@@ -112,13 +113,17 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-    fun setAppLocale() {
-        val settingsDataSource = UserSettingsDataSource.getInstance(applicationContext)
-        val locale = Locale(settingsDataSource.getPreferredLanguage())
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(setAppLocale(newBase))
+    }
+    fun setAppLocale(context: Context?) : Context?{
+        val settingsDataSource = context?.let { UserSettingsDataSource.getInstance(it) }
+        val locale = Locale(settingsDataSource?.getPreferredLanguage()?: "en")
         Locale.setDefault(locale)
-        val config = Configuration()
+        val config = Configuration(context?.resources?.configuration)
         config.locale = locale
-        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
+        return context?.createConfigurationContext(config)
     }
 
 }

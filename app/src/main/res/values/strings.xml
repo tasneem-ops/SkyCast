@@ -60,4 +60,13 @@
     <string name="location_required_error">App Needs Location Enabled to Function Correctly</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="back_online">Back Online</string>
+    <string name="you_are_currently_offline">You are Currently Offline</string>
+    <string name="delete_alert">Delete Alert?</string>
+    <string name="delete">Delete</string>
+    <string name="error">Error</string>
+    <string name="delete_place">Delete Place?</string>
+    <string name="permission_not_granted">Permission Not Granted</string>
+    <string name="app_need_location_permission_to_get_weather_data">App Need Location Permission to Get Weather Data</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -80,7 +80,8 @@ class FavoritesFragment : Fragment() {
                         }
                     }
                     is Response.Failure ->{
-                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            getString(R.string.error), Toast.LENGTH_SHORT).show()
                     }
                     is Response.Loading ->{
 
@@ -97,8 +98,9 @@ class FavoritesFragment : Fragment() {
     private fun initRecylerView() {
         val onDeleteClick = {
                 fav : FavDTO ->
-            Snackbar.make(binding.favRecyclerView, "Delete Place?", Snackbar.LENGTH_SHORT)
-                .setAction("Delete"){
+            Snackbar.make(binding.favRecyclerView,
+                getString(R.string.delete_place), Snackbar.LENGTH_SHORT)
+                .setAction(getString(R.string.delete)){
                     viewModel.deleteFav(fav)
                 }
                 .show()

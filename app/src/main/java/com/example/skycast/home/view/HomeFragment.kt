@@ -111,6 +111,7 @@ class HomeFragment : Fragment() {
         else{
             val latitude = requireArguments().getFloat("lat").toDouble()
             val longitude = requireArguments().getFloat("lng").toDouble()
+            latLng = LatLng(latitude, longitude)
             if (requireArguments().getBoolean("cache") == true){
                 weatherViewModel.getWeatherForecast(LatLng(latitude, longitude), getString(R.string.apiKey),
                     connectionStatus = connectionStatus, freshData = true)
@@ -141,14 +142,16 @@ class HomeFragment : Fragment() {
         Log.i(TAG, "showInitialSetupDialog: ")
         val builder: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(titleResource))
-            .setPositiveButton("Save") { _, which ->
+            .setPositiveButton(getString(R.string.save)) { _, which ->
                 takeAction(selected)
             }
-            .setNegativeButton("Cancel") { _, which ->
+            .setNegativeButton(getString(R.string.cancel)) { _, which ->
                 takeAction(selected)
             }
             .setSingleChoiceItems(
-                arrayOf("GPS", "Map"), 0
+                arrayOf(getString(R.string.gps),
+                    getString(R.string.map)),
+                0
             ) { _, which ->
                 selected = which
                 Log.i(TAG, "showInitialSetupDialog: ${selected}")
@@ -268,9 +271,9 @@ class HomeFragment : Fragment() {
 
     private fun showPermissionsNotGranted() {
         val builder: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Permission Not Granted")
-            .setMessage("App Need Location Permission to Get Weather Data")
-            .setPositiveButton("OK") { _, which ->
+            .setTitle(getString(R.string.permission_not_granted))
+            .setMessage(getString(R.string.app_need_location_permission_to_get_weather_data))
+            .setPositiveButton(getString(R.string.ok)) { _, which ->
                 requestPermissions(
                     arrayOf(
                         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -298,11 +301,9 @@ class HomeFragment : Fragment() {
         binding.layout.visibility = View.VISIBLE
         binding.currentWeather = data.current
         data.current?.let {
-            binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.US).format(data.current!!.dt * 1000L)
-            val geocoder = activity?.let { it1 -> Geocoder(it1, Locale.getDefault()) }
+            binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.getDefault()).format(data.current!!.dt * 1000L)
             latLng?.let {
-                val address = geocoder?.getFromLocation(it.latitude, it.longitude, 1)
-                binding.cityText.text = address?.get(0)?.locality
+                binding.cityText.text = latLngToCityName(it.latitude, it.longitude)
             }
             binding.weatherDescText.text = it.weatherDescription.capitalizeWords()
 
@@ -366,6 +367,21 @@ class HomeFragment : Fragment() {
         return split(delimiter).joinToString(delimiter) { word ->
             val smallCaseWord = word.lowercase()
             smallCaseWord.replaceFirstChar(Char::titlecaseChar)
+        }
+    }
+    fun latLngToCityName( latitude : Double, longitude: Double) : String?{
+        try {
+            val address = activity?.let { Geocoder(it, Locale.getDefault()).getFromLocation(latitude, longitude, 1) }
+            if(address == null)
+                return null
+            if (address.isEmpty())
+                return null
+            if(address.get(0).locality == null){
+                return address.get(0).adminArea + ", " + address.get(0)?.countryName
+            }
+            return address.get(0)?.locality + ", " + address.get(0)?.countryName
+        } catch (e : Exception){
+            return "UnKnown City"
         }
     }
     companion object{

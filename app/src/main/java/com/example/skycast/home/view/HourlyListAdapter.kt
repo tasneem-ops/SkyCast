@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
 import com.example.skycast.databinding.HourForecastItemBinding
 import com.example.skycast.home.model.dto.HourlyWeather
+import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_CELSIUS
+import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
+import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_KELVIN
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -20,8 +23,22 @@ class HourlyListAdapter (val unit : String) : ListAdapter<HourlyWeather, HourVie
 
     override fun onBindViewHolder(holder: HourViewHolder, position: Int) {
         holder.binding.weather = getItem(position)
-        holder.binding.unit = unit
-        holder.binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.US).format(getItem(position).dt * 1000L)
+        when(unit){
+            UNIT_CELSIUS -> {
+                holder.binding.unit = holder.binding.temp.context.getString(R.string.celcuis_unit)
+            }
+            UNIT_FAHRENHEIT ->{
+                holder.binding.unit = holder.binding.temp.context.getString(R.string.fahrenheit_unit)
+            }
+            UNIT_KELVIN ->{
+                holder.binding.unit = holder.binding.temp.context.getString(R.string.kelvin_unit)
+            }
+            else ->{
+                holder.binding.unit = holder.binding.temp.context.getString(R.string.celcuis_unit)
+            }
+        }
+
+        holder.binding.timeText.text = SimpleDateFormat("hh:mm aa" , Locale.getDefault()).format(getItem(position).dt * 1000L)
     }
 }
 class HourViewHolder(val binding : HourForecastItemBinding): RecyclerView.ViewHolder(binding.root)

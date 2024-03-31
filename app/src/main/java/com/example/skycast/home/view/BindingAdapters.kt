@@ -46,15 +46,15 @@ fun showWeatherStatusImage(view: ImageView, weatherIcon : Int){
 
 @BindingAdapter("dateTime")
 fun setDateTimeText(view: TextView, dateTime : Long){
-    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(dateTime)
+    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.getDefault()).format(dateTime)
 }
 @BindingAdapter("twoLineDateTime")
 fun setTwoLineDateTimeText(view: TextView, dateTime : Long){
-    view.text = SimpleDateFormat("hh:mm\nEE dd/MM/yy", Locale.US).format(dateTime)
+    view.text = SimpleDateFormat("hh:mm\nEE dd/MM/yy", Locale.getDefault()).format(dateTime)
 }
 @BindingAdapter("dateTime")
 fun setDateTimeText(view: TextView, dateTime : Int){
-    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.US).format(dateTime*1000L)
+    view.text = SimpleDateFormat("EE dd/MM/yyyy", Locale.getDefault()).format(dateTime*1000L)
 }
 
 @BindingAdapter("temp", "addSlash")

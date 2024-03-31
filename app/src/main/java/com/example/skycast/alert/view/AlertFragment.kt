@@ -76,8 +76,9 @@ class AlertFragment : Fragment() {
 
     private fun initRecyclerView() {
         alertsListAdapter = AlertsListAdapter{ alert ->
-            Snackbar.make(binding.alertsRecyclerView, "Delete Alert?", Snackbar.LENGTH_SHORT)
-                .setAction("Delete"){
+            Snackbar.make(binding.alertsRecyclerView,
+                getString(R.string.delete_alert), Snackbar.LENGTH_SHORT)
+                .setAction(getString(R.string.delete)){
                     AlarmScheduler(requireContext()).cancel(alert)
                     viewModel.deleteAlert(alert)
                 }
