@@ -4,6 +4,10 @@ The Weather Forecast App is a native Android application developed with Kotlin t
 
 ## Installation
 
+### Download APK
+
+You can download the latest version of the Weather Forecast App APK from https://drive.google.com/drive/folders/1KWi6WEdJYYXywuJK1yrqrX6CotzQ6Lt4?usp=sharing
+
 To install the Weather Forecast App, follow these steps:
 
 1. Clone the repository to your local machine:
@@ -13,6 +17,7 @@ To install the Weather Forecast App, follow these steps:
 3. Open the project in Android Studio.
 
 4. Build and run the project on an Android device or emulator.
+
 
 ## Features
 
@@ -45,7 +50,7 @@ Contributions to the Weather Forecast App are welcome! If you would like to cont
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is developed in ITI - MCIT
 
 ## Contact
 
