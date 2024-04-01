@@ -1,16 +1,14 @@
 package com.example.skycast
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.skycast.alert.model.dto.AlertDTO
-import com.example.skycast.alert.model.dto.NotificationType
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
-import com.example.skycast.model.local.FakeLocalDataSource
-import com.example.skycast.model.local.ILocalDataSource
-import com.example.skycast.model.network.FakeRemoteDataSource
-import com.example.skycast.model.network.IRemoteDataSource
-import com.example.skycast.model.repository.IWeatherRepository
-import com.example.skycast.model.repository.WeatherRepository
+import com.example.skycast.home.model.source.local.FakeLocalDataSource
+import com.example.skycast.home.model.source.local.WeatherLocalDataSource
+import com.example.skycast.home.model.source.network.FakeRemoteDataSource
+import com.example.skycast.home.model.source.network.WeatherRemoteDataSource
+import com.example.skycast.home.model.source.repository.WeatherRepository
+import com.example.skycast.home.model.source.repository.WeatherRepositoryImpl
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,9 +29,9 @@ class WeatherRepositoryTest {
     @get:Rule
     val instantTask = InstantTaskExecutorRule()
 
-    lateinit var remoteDataSource: IRemoteDataSource
-    lateinit var localDataSource: ILocalDataSource
-    lateinit var repository: IWeatherRepository
+    lateinit var remoteDataSource: WeatherRemoteDataSource
+    lateinit var localDataSource: WeatherLocalDataSource
+    lateinit var repository: WeatherRepository
 
     lateinit var remoteDailyList : List<DailyWeather>
     lateinit var remoteHourlyList : List<HourlyWeather>
@@ -77,7 +75,7 @@ class WeatherRepositoryTest {
     fun initializeRepository(){
         remoteDataSource = FakeRemoteDataSource()
         localDataSource = FakeLocalDataSource()
-        repository = WeatherRepository.getInstance(remoteDataSource, localDataSource, Dispatchers.Main)
+        repository = WeatherRepositoryImpl.getInstance(remoteDataSource, localDataSource, Dispatchers.Main)
     }
 
     @Test
@@ -178,18 +176,18 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun addAlert_getAlerts_identicalData() = runTest{
-        //Given Repository and alert
-        val alert = AlertDTO(10.0, 12.0, "Test", 10L, 20L, true, NotificationType.NOTIFICATION,"")
+    fun getSearchSuggestions_getsSuggestion() = runTest{
+        //Given
+        val query = "San"
 
-        //When add Alert
-        repository.addAlert(alert)
-        val result = repository.getAlerts()
+        //When
+        val result = repository.getSearchSuggestions(query, "", "", 5)
 
-        //Assert There's one alert and the data is correct
-        assertThat(result, `is`(notNullValue()))
-        assertThat(result.first().size, `is`(1))
-        assertThat(result.first().get(0), `is`(alert))
+        //Assert That result is correct
+        assertThat(result.first(), `is`(notNullValue()))
+        result.first().forEach {
+            assertThat(it.name?.contains(query), `is`(true))
+        }
     }
 
 }

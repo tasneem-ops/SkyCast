@@ -28,25 +28,27 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.skycast.R
-import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.databinding.FragmentHomeBinding
-import com.example.skycast.favorites.model.db.FavDB
 import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.home.model.dto.WeatherResult
 import com.example.skycast.home.viewmodel.WeatherViewModel
 import com.example.skycast.home.viewmodel.WeatherViewModelFactory
-import com.example.skycast.model.Response
-import com.example.skycast.model.local.LocalDataSource
-import com.example.skycast.model.local.UserSettingsDataSource
-import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.WeatherRepository
+import com.example.skycast.Response
+import com.example.skycast.home.model.source.local.WeatherLocalDataSourceImpl
+import com.example.skycast.settings.model.UserSettingsDataSource
+import com.example.skycast.home.model.source.network.WeatherRemoteDataSourceImpl
+import com.example.skycast.home.model.source.repository.WeatherRepositoryImpl
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_CELSIUS
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_KELVIN
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_MPH
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_MPS
 import com.example.skycast.work.DailyCacheWorker
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -78,21 +80,27 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weatherViewModelFactory = WeatherViewModelFactory(WeatherRepository(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
-                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
-                AlertsDB.getInstance(requireContext()).getAlertsDao(),
-                FavDB.getInstance(requireContext()).getFavDao())),
+        val weatherViewModelFactory = WeatherViewModelFactory(
+            WeatherRepositoryImpl.getInstance(
+            WeatherRemoteDataSourceImpl.getInstance(),
+            WeatherLocalDataSourceImpl.getInstance(WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao())),
             UserSettingsDataSource.getInstance(requireContext()))
         weatherViewModel = ViewModelProvider(this, weatherViewModelFactory).get(WeatherViewModel::class.java)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         initRecyclerView()
+        updateUI()
         if(arguments == null || arguments?.isEmpty == true ||
             arguments?.getFloat("lat") == 0.0f || arguments?.getFloat("lng") == 0.0f){
             Log.i(TAG, "onViewCreated: ")
+            if(requireArguments().getBoolean("update") == true){
+                getDataFromGPS()
+            }
             if(weatherViewModel.isLocationSaved()){
                 Log.i(TAG, "onViewCreated: Location Saved")
                 weatherViewModel.getWeatherForecastForSavedLocation(getString(R.string.apiKey))
+                val location = weatherViewModel.getSavedLocation()
+                binding.cityText.text = latLngToCityName(location.latitude, location.longitude)
             }
             else{
                 val locationSource = weatherViewModel.getLocationPreferences()
@@ -123,6 +131,18 @@ class HomeFragment : Fragment() {
             }
         }
         requestDailyCache()
+    }
+
+    private fun updateUI() {
+        when(weatherViewModel.getTempUnit()){
+            UNIT_CELSIUS -> binding.currentTempUnit.text = getString(R.string.celcuis_unit)
+            UNIT_FAHRENHEIT -> binding.currentTempUnit.text = getString(R.string.fahrenheit_unit)
+            UNIT_KELVIN -> binding.currentTempUnit.text = getString(R.string.kelvin_unit)
+        }
+        when(weatherViewModel.getSpeedUnit()){
+            UNIT_MPH -> binding.speedUnit.text = getString(R.string.mile_per_hour)
+            UNIT_MPS -> binding.speedUnit.text = getString(R.string.meter_per_second)
+        }
     }
 
     private fun requestDailyCache() {
@@ -207,7 +227,6 @@ class HomeFragment : Fragment() {
         Log.i(TAG, "getDataFromGPS: ")
         if(checkPermissions()){
             checkDeviceLocationSettings()
-//            getLocation()
         }
         else{
             requestPermissions(
@@ -220,7 +239,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        hourListAdapter = HourlyListAdapter("C")
+        hourListAdapter = HourlyListAdapter(weatherViewModel.getTempUnit())
         dayListAdapter = DailyListAdapter()
 
         binding.hourRecyclerView.apply {

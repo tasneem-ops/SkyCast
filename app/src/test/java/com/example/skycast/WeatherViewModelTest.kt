@@ -3,11 +3,9 @@ package com.example.skycast
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
-import com.example.skycast.home.model.dto.WeatherResult
 import com.example.skycast.home.viewmodel.WeatherViewModel
-import com.example.skycast.model.Response
-import com.example.skycast.model.local.FakeUserSettingsDataSource
-import com.example.skycast.model.repository.FakeWeatherRepository
+import com.example.skycast.settings.model.FakeUserSettingsDataSource
+import com.example.skycast.home.model.source.repository.FakeWeatherRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -124,6 +122,18 @@ class WeatherViewModelTest {
 
         //Assert That Saved Location Preference is GPS
         assertThat(weatherViewModel.getLocationPreferences(), `is`("GPS"))
+    }
+
+    @Test
+    fun updateLocationAndCache_locationUpdated(){
+        //Given WeatherViewModel Created
+
+        //When
+        weatherViewModel.updateLocationAndCache(LatLng(30.0, 20.0), "")
+
+        //Assert that location is saved
+        assertThat(weatherViewModel.isLocationSaved(), `is`(true))
+        assertThat(weatherViewModel.getSavedLocation(), `is`(LatLng(30.0, 20.0)))
     }
 
 }

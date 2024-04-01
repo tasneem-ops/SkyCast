@@ -1,35 +1,33 @@
-package com.example.skycast.model.network
+package com.example.skycast.home.model.source.repository
 
-import com.example.skycast.alert.model.dto.Alert
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
 import com.example.skycast.location.model.Place
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
-interface IRemoteDataSource {
-    fun getDailyForecast(
+interface WeatherRepository {
+    fun getDailyWeather(
         latLng: LatLng,
         apiKey: String,
-        units: String,
-        lang: String
+        lang: String,
+        forceUpdate: Boolean = false
     ): Flow<List<DailyWeather>>
 
-    fun getHourlyForecast(
+    fun getHourlyWeather(
         latLng: LatLng,
         apiKey: String,
-        units: String,
-        lang: String
+        lang: String,
+        forceUpdate: Boolean
     ): Flow<List<HourlyWeather>>
 
-    fun getCurrentForecast(
+    fun getCurrentWeather(
         latLng: LatLng,
         apiKey: String,
-        units: String,
-        lang: String
+        lang: String,
+        forceUpdate: Boolean
     ): Flow<HourlyWeather?>
-    fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert>
 
+    suspend fun updateWeatherCache(latLng: LatLng, apiKey: String)
     fun getSearchSuggestions(query : String, format: String, lang : String, limit : Int) : Flow<List<Place>>
-
 }

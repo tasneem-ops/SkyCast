@@ -60,7 +60,7 @@ fun setDateTimeText(view: TextView, dateTime : Int){
 @BindingAdapter("temp", "addSlash")
 fun setTempInt(view: TextView, temp : Double, addSlash : Boolean = false){
     if(addSlash){
-        view.text = "\\" + Math.round(temp).toString() + "°"
+        view.text = "/" + Math.round(temp).toString() + "°"
     }
     else{
         view.text = Math.round(temp).toString() + "°"
@@ -74,12 +74,7 @@ fun setTempInt(view: TextView, temp : Double){
 fun setTempInt(view: TextView, temp : Double, unit : String){
     view.text = Math.round(temp).toString() + "°" + unit
 }
-//@BindingAdapter("latitude", "longitude")
-//fun latLngToCityName(view: TextView, latitude : Double, longitude: Double){
-//    val address = Geocoder(view.context).getFromLocation(latitude, longitude, 1)
-//    if(address == null)
-//        return
-//    if (address.isEmpty())
-//        return
-//    view.text = address.get(0)?.locality
-//}
+@BindingAdapter("speed")
+fun formatDouble(view: TextView, num : Double){
+    view.text = String.format("%.2f", num)
+}

@@ -8,10 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView.OnQueryTextListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -19,17 +17,15 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
-import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.databinding.FragmentSearchBinding
-import com.example.skycast.favorites.model.db.FavDB
 import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.location.viewmodel.LocationViewModel
 import com.example.skycast.location.viewmodel.LocationViewModelFactory
-import com.example.skycast.model.Response
-import com.example.skycast.model.local.LocalDataSource
-import com.example.skycast.model.local.UserSettingsDataSource
-import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.WeatherRepository
+import com.example.skycast.Response
+import com.example.skycast.home.model.source.local.WeatherLocalDataSourceImpl
+import com.example.skycast.settings.model.UserSettingsDataSource
+import com.example.skycast.home.model.source.network.WeatherRemoteDataSourceImpl
+import com.example.skycast.home.model.source.repository.WeatherRepositoryImpl
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
@@ -51,12 +47,12 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = LocationViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(
+        viewModelFactory = LocationViewModelFactory(
+            WeatherRepositoryImpl.getInstance(
+            WeatherRemoteDataSourceImpl.getInstance(),
+            WeatherLocalDataSourceImpl.getInstance(
                 WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
-                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
-                AlertsDB.getInstance(requireContext()).getAlertsDao(),
-                FavDB.getInstance(requireContext()).getFavDao())), UserSettingsDataSource.getInstance(requireContext()))
+                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao())), UserSettingsDataSource.getInstance(requireContext()))
         viewModel = ViewModelProvider(this, viewModelFactory).get(LocationViewModel::class.java)
         initView()
         lifecycleScope.launch {

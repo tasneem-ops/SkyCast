@@ -1,6 +1,5 @@
-package com.example.skycast.model.local
+package com.example.skycast.settings.model
 
-import android.content.Context
 import com.google.android.gms.maps.model.LatLng
 
 class FakeUserSettingsDataSource : IUserSettingsDataSource {

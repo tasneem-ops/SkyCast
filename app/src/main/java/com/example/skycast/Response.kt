@@ -1,4 +1,4 @@
-package com.example.skycast.model
+package com.example.skycast
 
 sealed class Response<out T> {
     class Success<T>(val data : T) : Response<T>()

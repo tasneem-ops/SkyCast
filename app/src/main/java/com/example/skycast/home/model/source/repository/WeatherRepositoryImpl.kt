@@ -1,35 +1,30 @@
-package com.example.skycast.model.repository
+package com.example.skycast.home.model.source.repository
 
-import com.example.skycast.alert.model.dto.Alert
-import com.example.skycast.alert.model.dto.AlertDTO
-import com.example.skycast.favorites.model.dto.FavDTO
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
 import com.example.skycast.location.model.Place
-import com.example.skycast.model.local.ILocalDataSource
-import com.example.skycast.model.network.IRemoteDataSource
+import com.example.skycast.home.model.source.local.WeatherLocalDataSource
+import com.example.skycast.home.model.source.network.WeatherRemoteDataSource
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
 
-class WeatherRepository(val remoteDataSource: IRemoteDataSource,
-                        val localDataSource: ILocalDataSource,
-                        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
-    IWeatherRepository {
+class WeatherRepositoryImpl private constructor(
+    private val remoteDataSource: WeatherRemoteDataSource,
+    private val localDataSource: WeatherLocalDataSource,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
+    WeatherRepository {
     companion object{
         @Volatile
-        private var INSTANCE: WeatherRepository? = null
-        fun getInstance (remoteDataSource: IRemoteDataSource,localDataSource: ILocalDataSource,
-                         ioDispatcher: CoroutineDispatcher = Dispatchers.IO): WeatherRepository {
+        private var INSTANCE: WeatherRepositoryImpl? = null
+        fun getInstance (remoteDataSource: WeatherRemoteDataSource, localDataSource: WeatherLocalDataSource,
+                         ioDispatcher: CoroutineDispatcher = Dispatchers.IO): WeatherRepositoryImpl {
             return INSTANCE ?: synchronized(this){
-                val instance = WeatherRepository(remoteDataSource, localDataSource, ioDispatcher)
+                val instance = WeatherRepositoryImpl(remoteDataSource, localDataSource, ioDispatcher)
                 INSTANCE = instance
                 instance
             }
@@ -40,7 +35,7 @@ class WeatherRepository(val remoteDataSource: IRemoteDataSource,
             return remoteDataSource.getDailyForecast(latLng, apiKey, "metric", lang)
         }
         else{
-            val dt = (Date().time /1000).toInt()
+            val dt = (Date().time /1000).toInt() - (15* 3600)
             return localDataSource.getDailyWeather(dt, lang)
         }
     }
@@ -63,12 +58,6 @@ class WeatherRepository(val remoteDataSource: IRemoteDataSource,
         }
     }
     override suspend fun updateWeatherCache(latLng: LatLng, apiKey: String) = withContext(ioDispatcher){
-//        val job = SupervisorJob()
-//        val scope = CoroutineScope(ioDispatcher + job)
-//        val clearDatabaseJob = scope.launch {
-//
-//        }
-//        clearDatabaseJob.join()
         localDataSource.clearDailyWeather()
         localDataSource.clearHourlyWeather()
         val hourlyEnFlow = remoteDataSource.getHourlyForecast(latLng, apiKey, "metric", "en")
@@ -87,36 +76,8 @@ class WeatherRepository(val remoteDataSource: IRemoteDataSource,
         dailyArFlow.collectLatest {
             localDataSource.insertDailyWeather(*it.toTypedArray())
         }
-//        job.cancel()
     }
 
-    override fun getAlerts(): Flow<List<AlertDTO>> {
-        return localDataSource.getAlerts()
-    }
-
-    override suspend fun addAlert(alertDTO: AlertDTO): Long = withContext<Long>(ioDispatcher) {
-        return@withContext localDataSource.addAlert(alertDTO)
-    }
-
-    override suspend fun deleteAlert(alertDTO: AlertDTO): Int  = withContext(ioDispatcher){
-        return@withContext localDataSource.delete(alertDTO)
-    }
-
-    override suspend fun addFav(favDTO: FavDTO): Long = withContext(ioDispatcher){
-        return@withContext localDataSource.addFav(favDTO)
-    }
-
-    override fun getAllFav(): Flow<List<FavDTO>> {
-        return localDataSource.getAllFav()
-    }
-
-    override suspend fun deleteFav(favDTO: FavDTO): Int = withContext(ioDispatcher){
-        return@withContext localDataSource.deleteFav(favDTO)
-    }
-
-    override fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert> {
-        return remoteDataSource.getAlert(latLng, apiKey)
-    }
 
     override fun getSearchSuggestions(
         query: String,

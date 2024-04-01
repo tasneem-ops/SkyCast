@@ -1,32 +1,27 @@
 package com.example.skycast.settings.view
 
 import android.os.Bundle
-import android.provider.ContactsContract.Data
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.example.skycast.MainActivity
 import com.example.skycast.R
 import com.example.skycast.databinding.FragmentSettingsBinding
 import com.example.skycast.home.view.HomeFragment
-import com.example.skycast.home.view.HomeFragmentDirections
-import com.example.skycast.model.local.UserSettingsDataSource
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.ARABIC
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.ENGLISH
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.SOURCE_GPS
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.SOURCE_MAP
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_CELSIUS
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_KELVIN
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_MPH
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_MPS
+import com.example.skycast.settings.model.UserSettingsDataSource
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.ARABIC
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.ENGLISH
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.SOURCE_GPS
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.SOURCE_MAP
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_CELSIUS
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_KELVIN
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_MPH
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_MPS
 import com.example.skycast.settings.viewmodel.SettingsViewModel
 import com.example.skycast.settings.viewmodel.SettingsViewModelFactory
 
@@ -75,6 +70,8 @@ class SettingsFragment : Fragment() {
                 }
                 R.id.gpsRadio -> {
                     viewModel.setLocationSource(SOURCE_GPS)
+                    val action = SettingsFragmentDirections.actionSettingsFragmentToHomeFragment(update = true)
+                    Navigation.findNavController(binding.locationGroup).navigate(action)
                 }
             }
         }

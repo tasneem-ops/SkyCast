@@ -1,4 +1,4 @@
-package com.example.skycast.model.local
+package com.example.skycast.settings.model
 
 import com.google.android.gms.maps.model.LatLng
 

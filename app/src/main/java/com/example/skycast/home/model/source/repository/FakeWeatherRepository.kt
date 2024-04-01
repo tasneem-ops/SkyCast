@@ -1,6 +1,5 @@
-package com.example.skycast.model.repository
+package com.example.skycast.home.model.source.repository
 
-import com.example.skycast.alert.model.dto.Alert
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.favorites.model.dto.FavDTO
 import com.example.skycast.home.model.dto.DailyWeather
@@ -10,13 +9,26 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeWeatherRepository() : IWeatherRepository {
+class FakeWeatherRepository() : WeatherRepository {
     val localDailyWeatherList = arrayListOf<DailyWeather>()
     val localHourlyWeatherList = arrayListOf<HourlyWeather>()
     var localCurrentWeather : HourlyWeather? = null
 
     val alertlist = arrayListOf<AlertDTO>()
     val favList = arrayListOf<FavDTO>()
+    val cityNames = listOf(
+        "New York", "Los Angeles", "Chicago", "Houston", "Phoenix",
+        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
+        "Austin", "Jacksonville", "San Francisco", "Fort Worth", "Charlotte",
+        "Seattle", "Denver", "Washington", "Boston", "El Paso",
+        "Detroit", "Nashville", "Portland", "Memphis", "Oklahoma City",
+        "Las Vegas", "Louisville", "Baltimore", "Milwaukee", "Albuquerque",
+        "Tucson", "Fresno", "Sacramento", "Mesa", "Kansas City",
+        "Atlanta", "Long Beach", "Colorado Springs", "Miami"
+    )
+    val places = cityNames.map { cityName ->
+        Place(lat = null, lon = null, name = cityName, displayName = null)
+    }
 
     override fun getDailyWeather(
         latLng: LatLng,
@@ -102,50 +114,17 @@ class FakeWeatherRepository() : IWeatherRepository {
         localCurrentWeather = hourlyWeather1
     }
 
-    override fun getAlerts(): Flow<List<AlertDTO>> {
-        return flow {
-            emit(alertlist)
-        }
-    }
-
-    override suspend fun addAlert(alertDTO: AlertDTO): Long {
-        alertlist.add(alertDTO)
-        return 1L
-    }
-
-    override suspend fun deleteAlert(alertDTO: AlertDTO): Int {
-        alertlist.remove(alertDTO)
-        return 1
-    }
-
-    override suspend fun addFav(favDTO: FavDTO): Long {
-        favList.add(favDTO)
-        return 1L
-    }
-
-    override fun getAllFav(): Flow<List<FavDTO>> {
-        return flow{
-            emit(favList)
-        }
-    }
-
-    override suspend fun deleteFav(favDTO: FavDTO): Int {
-        favList.remove(favDTO)
-        return 1
-    }
-
-    override fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert> {
-        return flow {
-
-        }
-    }
-
     override fun getSearchSuggestions(
         query: String,
         format: String,
         lang: String,
         limit: Int
     ): Flow<List<Place>> {
-        TODO("Not yet implemented")
+        return flow {
+            val filtered = places.filter {
+                it.name.contentEquals(query)
+            }
+            emit(filtered)
+        }
     }
 }

@@ -47,6 +47,7 @@
                         android:background="@drawable/rounded_corners"
                         android:minHeight="?attr/actionBarSize"
                         android:theme="@style/ToolBarStyle"
+                        android:text="@string/app_name"
                         tools:layout_editor_absoluteX="1dp"
                         tools:layout_editor_absoluteY="268dp"
                         app:navigationIcon="@drawable/menu">

@@ -6,13 +6,11 @@ import android.content.Intent
 import android.util.Log
 import com.example.skycast.R
 import com.example.skycast.alert.model.db.AlertsDB
+import com.example.skycast.alert.model.db.AlertsLocalDataSourceImpl
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.model.dto.NotificationType
-import com.example.skycast.favorites.model.db.FavDB
-import com.example.skycast.home.model.db.WeatherDB
-import com.example.skycast.model.local.LocalDataSource
-import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.WeatherRepository
+import com.example.skycast.alert.model.network.AlertsRemoteDataSourceImpl
+import com.example.skycast.alert.model.repository.AlertsRepositoryImpl
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +27,9 @@ class AlarmReceiver: BroadcastReceiver() {
             return
         }
         val testLatLng = LatLng(55.7504461, 37.6174943)
-        val repository = WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(
-            WeatherDB.getInstance(context).getDailyWeatherDao(),
-            WeatherDB.getInstance(context).getHourlyWeatherDao(),
-            AlertsDB.getInstance(context).getAlertsDao(),
-            FavDB.getInstance(context).getFavDao()))
+        val repository = AlertsRepositoryImpl.getInstance(
+            AlertsRemoteDataSourceImpl.getInstance(),
+            AlertsLocalDataSourceImpl.getInstance(AlertsDB.getInstance(context).getAlertsDao()))
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 repository.getAlert(LatLng(item.latitude, item.longitude), context.getString(R.string.apiKey))
@@ -49,6 +44,7 @@ class AlarmReceiver: BroadcastReceiver() {
                                     Log.i(TAG, "Alarm: ")
                                     val intent = Intent(context, AlarmService::class.java)
                                     intent.putExtra("MESSAGE", it.event)
+                                    intent.putExtra("CITY",item.cityName)
                                     context.startService(intent)
                                 }
                             }
@@ -66,6 +62,7 @@ class AlarmReceiver: BroadcastReceiver() {
                             Log.i(TAG, "Alarm: ")
                             val intent = Intent(context, AlarmService::class.java)
                             intent.putExtra("MESSAGE", context.getString(R.string.no_alerts))
+                            intent.putExtra("CITY",item.cityName)
                             context.startService(intent)
                         }
                     }

@@ -14,17 +14,13 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
-import com.example.skycast.alert.model.db.AlertsDB
 import com.example.skycast.databinding.FragmentFavoritesBinding
+import com.example.skycast.favorites.model.FavoritesLocalDataSourceImpl
 import com.example.skycast.favorites.model.db.FavDB
 import com.example.skycast.favorites.model.dto.FavDTO
 import com.example.skycast.favorites.viewmodel.FavoritesViewModel
 import com.example.skycast.favorites.viewmodel.FavoritesViewModelFactory
-import com.example.skycast.home.model.db.WeatherDB
-import com.example.skycast.model.Response
-import com.example.skycast.model.local.LocalDataSource
-import com.example.skycast.model.network.RemoteDataSource
-import com.example.skycast.model.repository.WeatherRepository
+import com.example.skycast.Response
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -44,12 +40,8 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelFactory = FavoritesViewModelFactory(WeatherRepository.getInstance(RemoteDataSource.getInstance(),
-            LocalDataSource.getInstance(
-                WeatherDB.getInstance(requireContext()).getDailyWeatherDao(),
-                WeatherDB.getInstance(requireContext()).getHourlyWeatherDao(),
-                AlertsDB.getInstance(requireContext()).getAlertsDao(),
-                FavDB.getInstance(requireContext()).getFavDao())))
+        viewModelFactory = FavoritesViewModelFactory(FavoritesLocalDataSourceImpl
+            .getInstance(FavDB.getInstance(requireContext()).getFavDao()))
         viewModel = ViewModelProvider(this, viewModelFactory).get(FavoritesViewModel::class.java)
         initRecylerView()
         val connectivityManager = requireContext().getSystemService(ConnectivityManager::class.java)

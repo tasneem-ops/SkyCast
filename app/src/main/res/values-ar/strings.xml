@@ -11,7 +11,7 @@
     <string name="clear_sky">سماء صافية</string>
     <string name="search_for_place">ابحث عن أماكن..</string>
     <string name="fahrenheit_unit">ف</string>
-    <string name="kelvin_unit">كلفن</string>
+    <string name="kelvin_unit">كلڤن</string>
     <string name="hourly_forecast">توقعات كل ساعة</string>
     <string name="current_conditions">الأحوال الجوية</string>
     <string name="pressure">الضغط</string>
@@ -26,14 +26,14 @@
     <string name="location">الموقع</string>
     <string name="language">اللغة</string>
     <string name="map">الخريطة</string>
-    <string name="gps">لموقع الحالي</string>
+    <string name="gps">الموقع الحالي</string>
     <string name="arabic">اللغة العربية</string>
     <string name="english">اللغة الإنجليزية</string>
     <string name="speed_unit">وحدة قياس السرعة</string>
     <string name="temp_unit">وحدة قياس الحرارة</string>
     <string name="clesius">درجة مئوية</string>
     <string name="fahrenheit">فهرنهايت</string>
-    <string name="kelvin">كلفن</string>
+    <string name="kelvin">كلڤن</string>
     <string name="add_alert">أضف تنبيهًا</string>
     <string name="couldnt_get_data">لا تتوفر بيانات</string>
     <string name="loading">جار التحميل</string>

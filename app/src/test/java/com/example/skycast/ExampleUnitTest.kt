@@ -14,4 +14,9 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+    @Test
+    fun celsiusToFah(){
+        assertEquals(55.4, 13 * 1.8 +32, 0.01)
+    }
 }

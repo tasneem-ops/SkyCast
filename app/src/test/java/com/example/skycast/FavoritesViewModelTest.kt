@@ -1,10 +1,9 @@
 package com.example.skycast
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.skycast.favorites.model.FakeFavoritesLocalDataSource
 import com.example.skycast.favorites.model.dto.FavDTO
 import com.example.skycast.favorites.viewmodel.FavoritesViewModel
-import com.example.skycast.model.Response
-import com.example.skycast.model.repository.FakeWeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -27,8 +26,8 @@ class FavoritesViewModelTest {
     val fav2 = FavDTO("Ismailia", 35.0, 10.0)
     @Before
     fun createWeatherViewModel(){
-        val fakeWeatherRepository = FakeWeatherRepository()
-        favoritesViewModel = FavoritesViewModel(fakeWeatherRepository, Dispatchers.Main)
+        val fakeFavoritesLocalDataSource = FakeFavoritesLocalDataSource()
+        favoritesViewModel = FavoritesViewModel(fakeFavoritesLocalDataSource, Dispatchers.Main)
     }
 
     @Test

@@ -28,6 +28,10 @@
             android:name="cache"
             app:argType="boolean"
             android:defaultValue="true" />
+        <argument
+            android:name="update"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"

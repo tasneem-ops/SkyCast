@@ -1,4 +1,4 @@
-package com.example.skycast.model.local
+package com.example.skycast.home.model.source.local
 
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.favorites.model.dto.FavDTO
@@ -7,7 +7,7 @@ import com.example.skycast.home.model.dto.HourlyWeather
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeLocalDataSource : ILocalDataSource {
+class FakeLocalDataSource : WeatherLocalDataSource {
     var localDailyWeatherList = arrayListOf<DailyWeather>()
     var localHourlyWeatherList = arrayListOf<HourlyWeather>()
     var localCurrentWeather : HourlyWeather? = null
@@ -83,36 +83,19 @@ class FakeLocalDataSource : ILocalDataSource {
         localHourlyWeatherList.clear()
         return size
     }
-
-    override fun getAlerts(): Flow<List<AlertDTO>> {
-        return flow {
-            emit(alertlist)
-        }
-    }
-
-    override suspend fun addAlert(alert: AlertDTO): Long {
-        alertlist.add(alert)
-        return 1L
-    }
-
-    override suspend fun delete(alert: AlertDTO): Int {
-        alertlist.remove(alert)
-        return 1
-    }
-
-    override suspend fun addFav(favDTO: FavDTO): Long {
-        favList.add(favDTO)
-        return 1L
-    }
-
-    override fun getAllFav(): Flow<List<FavDTO>> {
-        return flow {
-            emit(favList)
-        }
-    }
-
-    override suspend fun deleteFav(favDTO: FavDTO): Int {
-        favList.remove(favDTO)
-        return 1
-    }
+//    override suspend fun addFav(favDTO: FavDTO): Long {
+//        favList.add(favDTO)
+//        return 1L
+//    }
+//
+//    override fun getAllFav(): Flow<List<FavDTO>> {
+//        return flow {
+//            emit(favList)
+//        }
+//    }
+//
+//    override suspend fun deleteFav(favDTO: FavDTO): Int {
+//        favList.remove(favDTO)
+//        return 1
+//    }
 }

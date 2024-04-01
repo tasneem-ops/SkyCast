@@ -1,7 +1,5 @@
-package com.example.skycast.model.network
+package com.example.skycast.home.model.source.network
 
-import com.example.skycast.alert.model.dto.Alert
-import com.example.skycast.home.model.dto.Current
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
 import com.example.skycast.location.model.Place
@@ -9,8 +7,20 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeRemoteDataSource : IRemoteDataSource {
-
+class FakeRemoteDataSource : WeatherRemoteDataSource {
+    val cityNames = listOf(
+        "New York", "Los Angeles", "Chicago", "Houston", "Phoenix",
+        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
+        "Austin", "Jacksonville", "San Francisco", "Fort Worth", "Charlotte",
+        "Seattle", "Denver", "Washington", "Boston", "El Paso",
+        "Detroit", "Nashville", "Portland", "Memphis", "Oklahoma City",
+        "Las Vegas", "Louisville", "Baltimore", "Milwaukee", "Albuquerque",
+        "Tucson", "Fresno", "Sacramento", "Mesa", "Kansas City",
+        "Atlanta", "Long Beach", "Colorado Springs", "Miami"
+    )
+    val places = cityNames.map { cityName ->
+        Place(lat = null, lon = null, name = cityName, displayName = null)
+    }
     override fun getDailyForecast(
         latLng: LatLng,
         apiKey: String,
@@ -72,19 +82,17 @@ class FakeRemoteDataSource : IRemoteDataSource {
         }
     }
 
-    override fun getAlert(latLng: LatLng, apiKey: String): Flow<Alert> {
-        val alert = Alert("", "Very Low Temp", 123, 456, "Freezing", emptyList())
-        return flow {
-            emit(alert)
-        }
-    }
-
     override fun getSearchSuggestions(
         query: String,
         format: String,
         lang: String,
         limit: Int
     ): Flow<List<Place>> {
-        TODO("Not yet implemented")
+        return flow {
+            val filtered = places.filter {
+                it.name.contentEquals(query)
+            }
+            emit(filtered)
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.example.skycast.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.skycast.model.local.UserSettingsDataSource
+import com.example.skycast.settings.model.UserSettingsDataSource
 
 class SettingsViewModelFactory(private val settingsDataSource: UserSettingsDataSource) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

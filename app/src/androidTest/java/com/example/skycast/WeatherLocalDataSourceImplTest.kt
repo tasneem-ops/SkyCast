@@ -9,8 +9,8 @@ import com.example.skycast.favorites.model.db.FavDB
 import com.example.skycast.home.model.db.WeatherDB
 import com.example.skycast.home.model.dto.DailyWeather
 import com.example.skycast.home.model.dto.HourlyWeather
-import com.example.skycast.model.local.ILocalDataSource
-import com.example.skycast.model.local.LocalDataSource
+import com.example.skycast.home.model.source.local.WeatherLocalDataSource
+import com.example.skycast.home.model.source.local.WeatherLocalDataSourceImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -23,11 +23,11 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-class LocalDataSourceTest {
+class WeatherLocalDataSourceImplTest {
     lateinit var weatherDB: WeatherDB
     lateinit var alertDB: AlertsDB
     lateinit var favDB: FavDB
-    lateinit var localDataSource: ILocalDataSource
+    lateinit var localDataSource: WeatherLocalDataSource
     @Before
     fun initDB(){
         weatherDB = Room.inMemoryDatabaseBuilder(
@@ -45,8 +45,7 @@ class LocalDataSourceTest {
             FavDB::class.java)
             .allowMainThreadQueries()
             .build()
-        localDataSource = LocalDataSource.getInstance(weatherDB.getDailyWeatherDao(), weatherDB.getHourlyWeatherDao(),
-            alertDB.getAlertsDao(), favDB.getFavDao())
+        localDataSource = WeatherLocalDataSourceImpl.getInstance(weatherDB.getDailyWeatherDao(), weatherDB.getHourlyWeatherDao())
     }
     @After
     fun closeDB(){
@@ -100,6 +99,26 @@ class LocalDataSourceTest {
 
         assertThat(result, `is`(notNullValue()))
         assertThat(result.first(), `is`(hourlyWeatherList.get(5)))
+    }
+
+    @Test
+    fun getHourlyWeatherForecast_retrieveNearestWeatherForecast() = runTest{
+        localDataSource.insertHourlyWeather(*hourlyWeatherList.toTypedArray())
+
+        val result = localDataSource.getHourlyWeatherForecast(1616983200, "en")
+
+        assertThat(result, `is`(notNullValue()))
+        assertThat(result.first(), `is`(hourlyWeatherList.take(24)))
+    }
+
+    @Test
+    fun getDailyWeatherForecast_retrieveNearestWeatherForecast() = runTest{
+        localDataSource.insertDailyWeather(*dailyWeatherList.toTypedArray())
+
+        val result = localDataSource.getDailyWeather(1648656000, "en")
+
+        assertThat(result, `is`(notNullValue()))
+        assertThat(result.first(), `is`(dailyWeatherList.take(7)))
     }
 
     val hourlyWeatherList = arrayListOf(

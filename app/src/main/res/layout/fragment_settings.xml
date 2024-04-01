@@ -247,7 +247,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/roboto_regular"
-                        android:text="@string/celcuis_unit" />
+                        android:text="@string/clesius" />
 
                     <RadioButton
                         android:id="@+id/fahRadio"
@@ -255,7 +255,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/roboto_regular"
-                        android:text="@string/fahrenheit_unit" />
+                        android:text="@string/fahrenheit" />
 
                     <RadioButton
                         android:id="@+id/kelvinRadio"
@@ -263,7 +263,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/roboto_regular"
-                        android:text="@string/kelvin_unit"/>
+                        android:text="@string/kelvin"/>
                 </RadioGroup>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -275,10 +275,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
+            android:visibility="gone"
             app:cardCornerRadius="12dp"
-            app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@id/temp_card">
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -302,12 +304,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
+                    android:checked="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:checked="true"
-                    app:trackTint="@color/switch_track_style"
-                    app:thumbTint="@color/switch_thumb_style"/>
+                    app:thumbTint="@color/switch_thumb_style"
+                    app:trackTint="@color/switch_track_style" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

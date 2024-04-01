@@ -2,7 +2,6 @@ package com.example.skycast
 
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -16,7 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.example.skycast.databinding.ActivityMainBinding
-import com.example.skycast.model.local.UserSettingsDataSource
+import com.example.skycast.settings.model.UserSettingsDataSource
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 

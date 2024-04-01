@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.skycast.alert.model.dto.AlertDTO
 import com.example.skycast.alert.model.dto.NotificationType
-import com.example.skycast.model.Response
-import com.example.skycast.model.local.UserSettingsDataSource
-import com.example.skycast.model.repository.IWeatherRepository
+import com.example.skycast.alert.model.repository.AlertsRepository
+import com.example.skycast.Response
+import com.example.skycast.settings.model.UserSettingsDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-class AlertViewModel(private val repository: IWeatherRepository, private val settingsDataSource: UserSettingsDataSource) : ViewModel() {
+class AlertViewModel(private val repository: AlertsRepository, private val settingsDataSource: UserSettingsDataSource) : ViewModel() {
     private val _responseDataState = MutableStateFlow<Response<List<AlertDTO>>>(Response.Loading())
     val respnseDataState: StateFlow<Response<List<AlertDTO>>> = _responseDataState.asStateFlow()
     val lang = settingsDataSource.getPreferredLanguage()

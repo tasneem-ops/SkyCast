@@ -1,8 +1,7 @@
-package com.example.skycast.model.local
+package com.example.skycast.settings.model
 
 import android.content.Context
 import com.google.android.gms.maps.model.LatLng
-import org.intellij.lang.annotations.Language
 
 class UserSettingsDataSource private constructor(val context: Context) : IUserSettingsDataSource {
 
@@ -80,7 +79,7 @@ class UserSettingsDataSource private constructor(val context: Context) : IUserSe
     companion object{
         @Volatile
         private var INSTANCE: UserSettingsDataSource? = null
-        fun getInstance (context: Context): UserSettingsDataSource{
+        fun getInstance (context: Context): UserSettingsDataSource {
             return INSTANCE ?: synchronized(this){
                 val instance = UserSettingsDataSource(context)
                 INSTANCE = instance

@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
 import com.example.skycast.databinding.HourForecastItemBinding
 import com.example.skycast.home.model.dto.HourlyWeather
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_CELSIUS
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
-import com.example.skycast.model.local.UserSettingsDataSource.Companion.UNIT_KELVIN
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_CELSIUS
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_FAHRENHEIT
+import com.example.skycast.settings.model.UserSettingsDataSource.Companion.UNIT_KELVIN
 import java.text.SimpleDateFormat
 import java.util.Locale
 

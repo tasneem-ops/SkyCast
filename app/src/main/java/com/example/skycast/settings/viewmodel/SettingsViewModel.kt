@@ -1,8 +1,7 @@
 package com.example.skycast.settings.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.skycast.model.local.UserSettingsDataSource
+import com.example.skycast.settings.model.UserSettingsDataSource
 import com.google.android.gms.maps.model.LatLng
 
 class SettingsViewModel(private val settingsDataSource: UserSettingsDataSource) : ViewModel(){

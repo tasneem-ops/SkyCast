@@ -37,8 +37,10 @@ class AlarmService : Service() {
         mediaPlayer.isLooping = true
         mediaPlayer.start()
         val eventText = alarmView.findViewById<TextView>(R.id.alert_message)
+        val cityText = alarmView.findViewById<TextView>(R.id.alarm_city)
         val dismissBtn = alarmView.findViewById<Button>(R.id.dismissBtn)
         eventText.text = intent?.getStringExtra("MESSAGE")
+        cityText.text = intent?.getStringExtra("CITY")
         dismissBtn.setOnClickListener {
             windowManager.removeView(alarmView)
             mediaPlayer.stop()
